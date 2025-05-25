@@ -46,7 +46,7 @@
         <dependency>
             <groupId>com.github.bsommerfeld.pathetic</groupId>
             <artifactId>pathetic-engine</artifactId>
-            <version>trunk-a39cf0d454-1</version>
+            <version>4.0.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
