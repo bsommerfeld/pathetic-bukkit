@@ -12,6 +12,11 @@
 
     <artifactId>v1_19_R2</artifactId>
 
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
     <repositories>
         <repository>
             <id>codemc-repo</id>

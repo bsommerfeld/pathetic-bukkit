@@ -12,6 +12,11 @@
 
     <artifactId>v1_21_R3</artifactId>
 
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+    </properties>
+
     <repositories>
         <repository>
             <id>codemc-repo</id>
