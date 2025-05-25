@@ -3,6 +3,9 @@ This is the Bukkit implementation of Pathetic. It provides a simple API to use t
 
 Currently Paper and Spigot are explicitly supported, every other server software is a lucky hit.
 
+
+*This repository was previously part of the [Pathetic repository](https://github.com/bsommerfeld/pathetic).*
+
 ## How to use it?
 To integrate pathetic into your bukkit project, follow the following steps:
 <br>
@@ -20,8 +23,8 @@ To integrate pathetic into your bukkit project, follow the following steps:
 </repositories>
 
 <dependency>
-    <groupId>com.github.bsommerfeld.pathetic</groupId>
-    <artifactId>pathetic-bukkit</artifactId>
+    <groupId>com.github.bsommerfeld.pathetic-bukkit</groupId>
+    <artifactId>core</artifactId>
     <version>VERSION</version>
 </dependency>
 ```
@@ -36,7 +39,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.bsommerfeld.pathetic:pathetic-bukkit:VERSION'
+    implementation 'com.github.bsommerfeld.pathetic-bukkit:core:VERSION'
 }
 ```
 
