@@ -42,4 +42,4 @@ dependencies {
 
 <h2>Example Usage</h2>
 
-<p>See the <a href="https://github.com/bsommerfeld/pathetic/tree/trunk/pathetic-bukkit/pathetic-example">pathetic-example</a> module for a detailed bukkit example.</p>
+<p>See the <a href="https://github.com/bsommerfeld/pathetic-bukkit/tree/trunk/example">example</a> module for a detailed example.</p>
