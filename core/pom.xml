@@ -45,8 +45,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.bsommerfeld.pathetic</groupId>
-            <artifactId>pathetic-engine</artifactId>
-            <version>trunk-a39cf0d454-1</version>
+            <artifactId>engine</artifactId>
+            <version>5.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
@@ -56,8 +56,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.bsommerfeld.pathetic</groupId>
-            <artifactId>pathetic-api</artifactId>
-            <version>trunk-a39cf0d454-1</version>
+            <artifactId>api</artifactId>
+            <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>de.bsommerfeld</groupId>
