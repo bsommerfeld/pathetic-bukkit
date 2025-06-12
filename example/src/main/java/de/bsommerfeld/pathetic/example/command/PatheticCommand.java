@@ -76,13 +76,10 @@ public class PatheticCommand implements TabExecutor {
         player.sendMessage("Starting pathfinding... [Distance: " + start.distance(target) + "]");
 
         /*
-         * Initiate pathfinding with the start and target positions, and a list of path filters.
-         * The path filters are used to customize the pathfinding process. In this example, we use
-         * the PassablePathFilter, MinimumHeightFilter, and DangerousMaterialsFilter to filter out
-         * invalid paths.
+         * Initiate pathfinding with the start and target positions. This is where the magic happens
+         * and where all the configuration stuff we initialized before do their job.
          */
-        CompletionStage<PathfinderResult> pathfindingResult =
-            pathfinder.findPath(start, target);
+        CompletionStage<PathfinderResult> pathfindingResult = pathfinder.findPath(start, target);
 
         // Handle the pathfinding result
         pathfindingResult.thenAccept(
@@ -96,7 +93,7 @@ public class PatheticCommand implements TabExecutor {
                     .getPath()
                     .forEach(
                         position -> {
-                          Location location = BukkitMapper.toLocation(position);
+                          Location location = BukkitMapper.toLocation(position, player.getWorld());
                           player.sendBlockChange(
                               location, Material.YELLOW_STAINED_GLASS.createBlockData());
                         });
