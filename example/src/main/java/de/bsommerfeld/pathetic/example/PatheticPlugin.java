@@ -4,7 +4,6 @@ import de.bsommerfeld.pathetic.api.factory.PathfinderFactory;
 import de.bsommerfeld.pathetic.api.factory.PathfinderInitializer;
 import de.bsommerfeld.pathetic.api.pathing.Offset;
 import de.bsommerfeld.pathetic.api.pathing.Pathfinder;
-import de.bsommerfeld.pathetic.api.pathing.configuration.HeuristicWeights;
 import de.bsommerfeld.pathetic.api.pathing.configuration.PathfinderConfiguration;
 import de.bsommerfeld.pathetic.bukkit.PatheticBukkit;
 import de.bsommerfeld.pathetic.bukkit.initializer.BukkitPathfinderInitializer;
@@ -40,9 +39,6 @@ public final class PatheticPlugin extends JavaPlugin {
         PathfinderConfiguration.builder()
             .provider(new LoadingNavigationPointProvider()) // For loading chunks
             .fallback(true) // Allow fallback strategies if the primary fails
-            .heuristicWeights(
-                HeuristicWeights.create(
-                    1.0, 1.0, 1.0, 1.0, 0.0)) // custom weights for default paths
             .nodeValidationProcessors(
                 List.of(new SimpleValidationProcessor(), new WalkableProcessor(2)))
             .nodeCostProcessors(List.of(new SimpleCostProcessor()))
