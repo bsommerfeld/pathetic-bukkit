@@ -22,7 +22,7 @@ public class SimpleValidationProcessor implements NodeValidationProcessor {
     return context
         .getPathfinderConfiguration()
         .getProvider()
-        .getNavigationPoint(context.getCurrentPathPosition())
+        .getNavigationPoint(context.getCurrentPathPosition(), context.getEnvironmentContext())
         .isTraversable();
   }
 }
