@@ -3,6 +3,7 @@ package de.bsommerfeld.pathetic.example.command;
 import de.bsommerfeld.pathetic.api.pathing.Pathfinder;
 import de.bsommerfeld.pathetic.api.pathing.result.PathfinderResult;
 import de.bsommerfeld.pathetic.api.wrapper.PathPosition;
+import de.bsommerfeld.pathetic.bukkit.context.BukkitEnvironmentContext;
 import de.bsommerfeld.pathetic.bukkit.mapper.BukkitMapper;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -77,9 +78,13 @@ public class PatheticCommand implements TabExecutor {
 
         /*
          * Initiate pathfinding with the start and target positions. This is where the magic happens
-         * and where all the configuration stuff we initialized before do their job.
+         * and where all the configuration stuff we initialized before does their job.
+         *
+         * Since 5.1.0: Here we have to give the findPath method a new BukkitEnvironmentContext,
+         * which effectively gives the Pathfinder information about the world (or THE world).
          */
-        CompletionStage<PathfinderResult> pathfindingResult = pathfinder.findPath(start, target);
+        CompletionStage<PathfinderResult> pathfindingResult =
+            pathfinder.findPath(start, target, new BukkitEnvironmentContext(player.getWorld()));
 
         // Handle the pathfinding result
         pathfindingResult.thenAccept(

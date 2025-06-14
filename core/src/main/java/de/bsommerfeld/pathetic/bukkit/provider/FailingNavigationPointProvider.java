@@ -1,17 +1,19 @@
 package de.bsommerfeld.pathetic.bukkit.provider;
 
+import de.bsommerfeld.pathetic.api.pathing.context.EnvironmentContext;
 import de.bsommerfeld.pathetic.api.provider.NavigationPoint;
 import de.bsommerfeld.pathetic.api.provider.NavigationPointProvider;
 import de.bsommerfeld.pathetic.api.wrapper.PathPosition;
+import de.bsommerfeld.pathetic.bukkit.context.BukkitEnvironmentContext;
 import de.bsommerfeld.pathetic.bukkit.provider.world.WorldDomain;
 import de.bsommerfeld.pathetic.bukkit.util.BukkitVersionUtil;
 import de.bsommerfeld.pathetic.bukkit.util.ChunkUtil;
 import de.bsommerfeld.pathetic.resolver.ChunkDataProviderResolver;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
@@ -79,8 +81,9 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
    * @return An optional containing the navigation point if found, or an empty optional if the chunk
    *     is not loaded or the position is invalid.
    */
-  private static Optional<NavigationPoint> fetchNavigationPoint(PathPosition position) {
-    Optional<ChunkSnapshot> chunkSnapshotOptional = getChunkSnapshot(position);
+  private static Optional<NavigationPoint> fetchNavigationPoint(
+      PathPosition position, BukkitEnvironmentContext environmentContext) {
+    Optional<ChunkSnapshot> chunkSnapshotOptional = getChunkSnapshot(position, environmentContext);
 
     int chunkX = position.getFlooredX() >> 4;
     int chunkZ = position.getFlooredZ() >> 4;
@@ -111,26 +114,27 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
    * @return An optional containing the chunk snapshot if found, or an empty optional if the chunk
    *     is not loaded or the world is invalid.
    */
-  protected static Optional<ChunkSnapshot> getChunkSnapshot(PathPosition position) {
+  protected static Optional<ChunkSnapshot> getChunkSnapshot(
+      PathPosition position, BukkitEnvironmentContext environmentContext) {
     int chunkX = position.getFlooredX() >> 4;
     int chunkZ = position.getFlooredZ() >> 4;
 
-    if (SNAPSHOTS_MAP.containsKey(position.getPathEnvironment().getUuid())) {
+    UUID uuid = environmentContext.getWorld().getUID();
+    if (SNAPSHOTS_MAP.containsKey(uuid)) {
 
-      WorldDomain worldDomain = SNAPSHOTS_MAP.get(position.getPathEnvironment().getUuid());
+      WorldDomain worldDomain = SNAPSHOTS_MAP.get(uuid);
       long chunkKey = ChunkUtil.getChunkKey(chunkX, chunkZ);
 
       Optional<ChunkSnapshot> snapshot = worldDomain.getSnapshot(chunkKey);
       if (snapshot.isPresent()) return snapshot;
     }
 
-    World world = Bukkit.getWorld(position.getPathEnvironment().getUuid());
+    World world = Bukkit.getWorld(uuid);
     if (world == null) return Optional.empty();
 
     if (world.isChunkLoaded(chunkX, chunkZ))
       return Optional.ofNullable(
           processChunkSnapshot(
-              position,
               chunkX,
               chunkZ,
               CHUNK_DATA_PROVIDER_RESOLVER
@@ -144,25 +148,30 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
    * Processes a chunk snapshot by caching it in the {@link #SNAPSHOTS_MAP}. This method ensures
    * that future requests for the same chunk can be served from the cache.
    *
-   * @param position The position used to access the world's UUID.
    * @param chunkX The X coordinate of the chunk.
    * @param chunkZ The Z coordinate of the chunk.
    * @param chunkSnapshot The chunk snapshot to process.
    * @return The processed chunk snapshot.
    */
   protected static ChunkSnapshot processChunkSnapshot(
-      PathPosition position, int chunkX, int chunkZ, ChunkSnapshot chunkSnapshot) {
-    WorldDomain worldDomain =
-        SNAPSHOTS_MAP.computeIfAbsent(
-            position.getPathEnvironment().getUuid(), uuid -> new WorldDomain());
+      int chunkX, int chunkZ, ChunkSnapshot chunkSnapshot) {
+    if (chunkSnapshot == null) return null;
+    UUID uuid =
+        Objects.requireNonNull(
+                Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                "Failed to retrieve world by EnvironmentContext.")
+            .getUID();
+    WorldDomain worldDomain = SNAPSHOTS_MAP.computeIfAbsent(uuid, unused -> new WorldDomain());
     worldDomain.addSnapshot(ChunkUtil.getChunkKey(chunkX, chunkZ), chunkSnapshot);
     return chunkSnapshot;
   }
 
-  /** {@inheritDoc} */
   @Override
-  public NavigationPoint getNavigationPoint(@NonNull PathPosition position) {
-    Optional<NavigationPoint> point = fetchNavigationPoint(position);
+  public NavigationPoint getNavigationPoint(
+      PathPosition pathPosition, EnvironmentContext environmentContext) {
+    BukkitEnvironmentContext bukkitEnvironmentContext =
+        (BukkitEnvironmentContext) environmentContext;
+    Optional<NavigationPoint> point = fetchNavigationPoint(pathPosition, bukkitEnvironmentContext);
     return point.orElse(null);
   }
 }

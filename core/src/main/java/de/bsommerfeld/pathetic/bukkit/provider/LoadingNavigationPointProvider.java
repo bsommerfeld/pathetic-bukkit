@@ -1,12 +1,12 @@
 package de.bsommerfeld.pathetic.bukkit.provider;
 
+import de.bsommerfeld.pathetic.api.pathing.context.EnvironmentContext;
 import de.bsommerfeld.pathetic.api.provider.NavigationPoint;
-import de.bsommerfeld.pathetic.api.wrapper.PathEnvironment;
 import de.bsommerfeld.pathetic.api.wrapper.PathPosition;
+import de.bsommerfeld.pathetic.bukkit.context.BukkitEnvironmentContext;
 import de.bsommerfeld.pathetic.bukkit.util.ChunkUtil;
 import de.bsommerfeld.pathetic.engine.util.ErrorLogger;
 import java.util.Optional;
-import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
@@ -25,17 +25,17 @@ import org.bukkit.block.BlockState;
 public class LoadingNavigationPointProvider extends FailingNavigationPointProvider {
 
   /**
-   * Retrieves a chunk snapshot for the specified world and chunk coordinates, loading the chunk if
-   * it's not already loaded.
+   * Retrieves a {@link ChunkSnapshot} for the specified chunk coordinates within the given {@link
+   * BukkitEnvironmentContext}.
    *
-   * @param world The {@link PathEnvironment} representing the world.
-   * @param chunkX The X coordinate of the chunk.
-   * @param chunkZ The Z coordinate of the chunk.
-   * @return The {@link ChunkSnapshot} for the specified chunk.
+   * @param environmentContext The context providing the {@link World} to retrieve the chunk from.
+   * @param chunkX The x-coordinate of the chunk.
+   * @param chunkZ The z-coordinate of the chunk.
+   * @return The {@link ChunkSnapshot} representing the specified chunk.
    */
   private static ChunkSnapshot retrieveChunkSnapshot(
-      PathEnvironment world, int chunkX, int chunkZ) {
-    World bukkitWorld = Bukkit.getWorld(world.getUuid());
+      BukkitEnvironmentContext environmentContext, int chunkX, int chunkZ) {
+    World bukkitWorld = Bukkit.getWorld(environmentContext.getWorld().getUID());
     return CHUNK_DATA_PROVIDER_RESOLVER
         .getChunkDataProvider()
         .getSnapshot(bukkitWorld, chunkX, chunkZ);
@@ -50,16 +50,16 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
    * @return The {@link ChunkSnapshot} for the specified position.
    * @throws IllegalStateException If the chunk snapshot cannot be retrieved.
    */
-  private static ChunkSnapshot retrieveSnapshot(PathPosition position) {
+  private static ChunkSnapshot retrieveSnapshot(
+      PathPosition position, BukkitEnvironmentContext environmentContext) {
     int chunkX = position.getFlooredX() >> 4;
     int chunkZ = position.getFlooredZ() >> 4;
 
-    Optional<ChunkSnapshot> chunkSnapshotOptional = getChunkSnapshot(position);
+    Optional<ChunkSnapshot> chunkSnapshotOptional = getChunkSnapshot(position, environmentContext);
 
     return chunkSnapshotOptional.orElseGet(
         () -> {
-          ChunkSnapshot chunkSnapshot =
-              retrieveChunkSnapshot(position.getPathEnvironment(), chunkX, chunkZ);
+          ChunkSnapshot chunkSnapshot = retrieveChunkSnapshot(environmentContext, chunkX, chunkZ);
 
           if (chunkSnapshot == null) {
             throw ErrorLogger.logFatalError(
@@ -68,10 +68,10 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
                     + ", "
                     + chunkZ
                     + ") in world: "
-                    + position.getPathEnvironment().getUuid());
+                    + environmentContext.getWorld().getName());
           }
 
-          processChunkSnapshot(position, chunkX, chunkZ, chunkSnapshot);
+          processChunkSnapshot(chunkX, chunkZ, chunkSnapshot);
           return chunkSnapshot;
         });
   }
@@ -83,11 +83,12 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
    * @param pathPosition The {@link PathPosition} to get the {@link NavigationPoint} for.
    * @return The {@link NavigationPoint} at the specified position.
    */
-  private static NavigationPoint ensureNavigationPoint(PathPosition pathPosition) {
+  private static NavigationPoint ensureNavigationPoint(
+      PathPosition pathPosition, BukkitEnvironmentContext environmentContext) {
     int chunkX = pathPosition.getFlooredX() >> 4;
     int chunkZ = pathPosition.getFlooredZ() >> 4;
 
-    ChunkSnapshot chunkSnapshot = retrieveSnapshot(pathPosition);
+    ChunkSnapshot chunkSnapshot = retrieveSnapshot(pathPosition, environmentContext);
     int x = pathPosition.getFlooredX() - chunkX * 16;
     int z = pathPosition.getFlooredZ() - chunkZ * 16;
 
@@ -107,8 +108,13 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
    * data.
    */
   @Override
-  public NavigationPoint getNavigationPoint(@NonNull PathPosition position) {
-    NavigationPoint navigationPoint = super.getNavigationPoint(position);
-    return navigationPoint == null ? ensureNavigationPoint(position) : navigationPoint;
+  public NavigationPoint getNavigationPoint(
+      PathPosition pathPosition, EnvironmentContext environmentContext) {
+    BukkitEnvironmentContext bukkitEnvironmentContext =
+        (BukkitEnvironmentContext) environmentContext;
+    NavigationPoint navigationPoint = super.getNavigationPoint(pathPosition, environmentContext);
+    return navigationPoint == null
+        ? ensureNavigationPoint(pathPosition, bukkitEnvironmentContext)
+        : navigationPoint;
   }
 }
