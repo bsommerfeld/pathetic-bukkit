@@ -8,6 +8,7 @@ import de.bsommerfeld.pathetic.api.pathing.configuration.HeuristicWeights;
 import de.bsommerfeld.pathetic.api.pathing.configuration.PathfinderConfiguration;
 import de.bsommerfeld.pathetic.bukkit.PatheticBukkit;
 import de.bsommerfeld.pathetic.bukkit.initializer.BukkitPathfinderInitializer;
+import de.bsommerfeld.pathetic.bukkit.processor.validation.WalkableProcessor;
 import de.bsommerfeld.pathetic.bukkit.provider.LoadingNavigationPointProvider;
 import de.bsommerfeld.pathetic.engine.factory.AStarPathfinderFactory;
 import de.bsommerfeld.pathetic.example.command.PatheticCommand;
@@ -42,7 +43,8 @@ public final class PatheticPlugin extends JavaPlugin {
             .heuristicWeights(
                 HeuristicWeights.create(
                     1.0, 1.0, 1.0, 1.0, 0.0)) // custom weights for default paths
-            .nodeValidationProcessors(List.of(new SimpleValidationProcessor()))
+            .nodeValidationProcessors(
+                List.of(new SimpleValidationProcessor(), new WalkableProcessor(2)))
             .nodeCostProcessors(List.of(new SimpleCostProcessor()))
             .offset(Offset.MERGED) // this allows for diagonal AND vertical paths
             .maxIterations(
