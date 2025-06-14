@@ -1,7 +1,7 @@
 package de.bsommerfeld.pathetic.bukkit.provider;
 
-import de.bsommerfeld.pathetic.api.provider.NavigationPointProvider;
 import de.bsommerfeld.pathetic.api.provider.NavigationPoint;
+import de.bsommerfeld.pathetic.api.provider.NavigationPointProvider;
 import de.bsommerfeld.pathetic.api.wrapper.PathPosition;
 import de.bsommerfeld.pathetic.bukkit.provider.world.WorldDomain;
 import de.bsommerfeld.pathetic.bukkit.util.BukkitVersionUtil;
@@ -89,13 +89,14 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
       int x = position.getFlooredX() - chunkX * 16;
       int z = position.getFlooredZ() - chunkZ * 16;
 
-      Material material =
-          ChunkUtil.getMaterial(chunkSnapshotOptional.get(), x, position.getFlooredY(), z);
+      ChunkSnapshot chunkSnapshot = chunkSnapshotOptional.get();
+
+      Material material = ChunkUtil.getMaterial(chunkSnapshot, x, position.getFlooredY(), z);
       BlockState blockState =
           CHUNK_DATA_PROVIDER_RESOLVER
               .getChunkDataProvider()
-              .getBlockState(chunkSnapshotOptional.get(), x, position.getFlooredY(), z);
-      return Optional.of(new BukkitNavigationPoint(material, blockState));
+              .getBlockState(chunkSnapshot, x, position.getFlooredY(), z);
+      return Optional.of(new BukkitNavigationPoint(chunkSnapshot, material, blockState));
     }
 
     return Optional.empty();

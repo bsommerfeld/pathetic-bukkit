@@ -96,7 +96,7 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
         CHUNK_DATA_PROVIDER_RESOLVER
             .getChunkDataProvider()
             .getBlockState(chunkSnapshot, x, pathPosition.getFlooredY(), z);
-    return new BukkitNavigationPoint(material, blockState);
+    return new BukkitNavigationPoint(chunkSnapshot, material, blockState);
   }
 
   /**
