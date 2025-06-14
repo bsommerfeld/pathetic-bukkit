@@ -7,7 +7,6 @@ import de.bsommerfeld.pathetic.api.pathing.Pathfinder;
 import de.bsommerfeld.pathetic.api.pathing.configuration.PathfinderConfiguration;
 import de.bsommerfeld.pathetic.bukkit.PatheticBukkit;
 import de.bsommerfeld.pathetic.bukkit.initializer.BukkitPathfinderInitializer;
-import de.bsommerfeld.pathetic.bukkit.processor.validation.WalkableProcessor;
 import de.bsommerfeld.pathetic.bukkit.provider.LoadingNavigationPointProvider;
 import de.bsommerfeld.pathetic.engine.factory.AStarPathfinderFactory;
 import de.bsommerfeld.pathetic.example.command.PatheticCommand;
@@ -39,12 +38,14 @@ public final class PatheticPlugin extends JavaPlugin {
         PathfinderConfiguration.builder()
             .provider(new LoadingNavigationPointProvider()) // For loading chunks
             .fallback(true) // Allow fallback strategies if the primary fails
+            .async(true) // This also works on Bukkit servers!
             .nodeValidationProcessors(
-                List.of(new SimpleValidationProcessor(), new WalkableProcessor(2)))
+                List.of(new SimpleValidationProcessor()))
             .nodeCostProcessors(List.of(new SimpleCostProcessor()))
             .offset(Offset.MERGED) // this allows for diagonal AND vertical paths
             .maxIterations(
-                100000) // a higher count allows for more freedom, but also increases computation
+                Integer.MAX_VALUE) // a higher count allows for more freedom, but also increases
+            // computation
             .build();
 
     // Create the pathfinding instance with the factory from the configuration and initializer.
