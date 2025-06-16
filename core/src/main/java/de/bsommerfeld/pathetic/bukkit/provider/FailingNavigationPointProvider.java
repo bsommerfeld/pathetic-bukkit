@@ -119,7 +119,7 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
     int chunkX = position.getFlooredX() >> 4;
     int chunkZ = position.getFlooredZ() >> 4;
 
-    UUID uuid = environmentContext.getWorld().getUID();
+    UUID uuid = environmentContext.getWorldUID();
     if (SNAPSHOTS_MAP.containsKey(uuid)) {
 
       WorldDomain worldDomain = SNAPSHOTS_MAP.get(uuid);
@@ -135,6 +135,7 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
     if (world.isChunkLoaded(chunkX, chunkZ))
       return Optional.ofNullable(
           processChunkSnapshot(
+              environmentContext,
               chunkX,
               chunkZ,
               CHUNK_DATA_PROVIDER_RESOLVER
@@ -154,11 +155,14 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
    * @return The processed chunk snapshot.
    */
   protected static ChunkSnapshot processChunkSnapshot(
-      int chunkX, int chunkZ, ChunkSnapshot chunkSnapshot) {
+      BukkitEnvironmentContext environmentContext,
+      int chunkX,
+      int chunkZ,
+      ChunkSnapshot chunkSnapshot) {
     if (chunkSnapshot == null) return null;
     UUID uuid =
         Objects.requireNonNull(
-                Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                Bukkit.getWorld(environmentContext.getWorldUID()),
                 "Failed to retrieve world by EnvironmentContext.")
             .getUID();
     WorldDomain worldDomain = SNAPSHOTS_MAP.computeIfAbsent(uuid, unused -> new WorldDomain());

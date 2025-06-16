@@ -35,7 +35,7 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
    */
   private static ChunkSnapshot retrieveChunkSnapshot(
       BukkitEnvironmentContext environmentContext, int chunkX, int chunkZ) {
-    World bukkitWorld = Bukkit.getWorld(environmentContext.getWorld().getUID());
+    World bukkitWorld = Bukkit.getWorld(environmentContext.getWorldUID());
     return CHUNK_DATA_PROVIDER_RESOLVER
         .getChunkDataProvider()
         .getSnapshot(bukkitWorld, chunkX, chunkZ);
@@ -68,10 +68,10 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
                     + ", "
                     + chunkZ
                     + ") in world: "
-                    + environmentContext.getWorld().getName());
+                    + environmentContext.getWorldUID());
           }
 
-          processChunkSnapshot(chunkX, chunkZ, chunkSnapshot);
+          processChunkSnapshot(environmentContext, chunkX, chunkZ, chunkSnapshot);
           return chunkSnapshot;
         });
   }

@@ -38,9 +38,7 @@ public final class PatheticPlugin extends JavaPlugin {
         PathfinderConfiguration.builder()
             .provider(new LoadingNavigationPointProvider()) // For loading chunks
             .fallback(true) // Allow fallback strategies if the primary fails
-            .async(true) // This also works on Bukkit servers!
-            .nodeValidationProcessors(
-                List.of(new SimpleValidationProcessor()))
+            .nodeValidationProcessors(List.of(new SimpleValidationProcessor()))
             .nodeCostProcessors(List.of(new SimpleCostProcessor()))
             .offset(Offset.MERGED) // this allows for diagonal AND vertical paths
             .maxIterations(
