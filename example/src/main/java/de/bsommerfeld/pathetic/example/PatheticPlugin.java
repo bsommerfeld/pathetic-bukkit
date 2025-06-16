@@ -41,8 +41,7 @@ public final class PatheticPlugin extends JavaPlugin {
             .nodeValidationProcessors(List.of(new SimpleValidationProcessor()))
             .nodeCostProcessors(List.of(new SimpleCostProcessor()))
             .offset(Offset.MERGED) // this allows for diagonal AND vertical paths
-            .maxIterations(
-                Integer.MAX_VALUE) // a higher count allows for more freedom, but also increases
+            .maxIterations(100000) // a higher count allows for more freedom, but also increases
             // computation
             .build();
 
