@@ -5,7 +5,6 @@ import de.bsommerfeld.pathetic.api.factory.PathfinderInitializer;
 import de.bsommerfeld.pathetic.api.pathing.Offset;
 import de.bsommerfeld.pathetic.api.pathing.Pathfinder;
 import de.bsommerfeld.pathetic.api.pathing.configuration.PathfinderConfiguration;
-import de.bsommerfeld.pathetic.api.pathing.heuristic.HeuristicMode;
 import de.bsommerfeld.pathetic.bukkit.PatheticBukkit;
 import de.bsommerfeld.pathetic.bukkit.initializer.BukkitPathfinderInitializer;
 import de.bsommerfeld.pathetic.bukkit.provider.LoadingNavigationPointProvider;
@@ -41,11 +40,14 @@ public final class PatheticPlugin extends JavaPlugin {
             .fallback(true) // Allow fallback strategies if the primary fails
             .nodeValidationProcessors(List.of(new SimpleValidationProcessor()))
             .nodeCostProcessors(List.of(new SimpleCostProcessor()))
-            .heuristicMode(HeuristicMode.PERFORMANCE)
             .offset(Offset.MERGED) // this allows for diagonal AND vertical paths
             .maxIterations(100000) // a higher count allows for more freedom, but also increases
             // computation
             .build();
+
+    // There are many more options inside the configuration which are not covered here.
+    // Not all options are useful for everyone, and I would advise, to keep your fingers away
+    // From options you can't assign. There are always good default values set!
 
     // Create the pathfinding instance with the factory from the configuration and initializer.
     Pathfinder reusablePathfinder = factory.createPathfinder(configuration, initializer);

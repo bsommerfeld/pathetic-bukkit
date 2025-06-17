@@ -13,6 +13,10 @@
     <artifactId>core</artifactId>
     <version>${revision}</version>
 
+    <properties>
+        <pathetic.version>5.2.0</pathetic.version>
+    </properties>
+
     <repositories>
         <repository>
             <id>spigot-repo</id>
@@ -46,7 +50,7 @@
         <dependency>
             <groupId>com.github.bsommerfeld.pathetic</groupId>
             <artifactId>engine</artifactId>
-            <version>trunk-da58fe62e6-1</version>
+            <version>${pathetic.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
@@ -57,7 +61,7 @@
         <dependency>
             <groupId>com.github.bsommerfeld.pathetic</groupId>
             <artifactId>api</artifactId>
-            <version>trunk-da58fe62e6-1</version>
+            <version>${pathetic.version}</version>
         </dependency>
         <dependency>
             <groupId>de.bsommerfeld</groupId>
