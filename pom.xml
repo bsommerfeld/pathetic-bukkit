@@ -38,8 +38,9 @@
         <module>provider/spigot/v1_21_R1</module>
         <module>provider/spigot/v1_21_R2</module>
         <module>provider/spigot/v1_21_R3</module>
-        <module>provider/resolver</module>
         <module>provider/spigot/v1_21_R4</module>
+        <module>provider/spigot/v1_21_R5</module>
+        <module>provider/resolver</module>
     </modules>
 
     <build>
