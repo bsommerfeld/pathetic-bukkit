@@ -7,7 +7,6 @@ import de.bsommerfeld.pathetic.bukkit.context.BukkitEnvironmentContext;
 import de.bsommerfeld.pathetic.bukkit.util.ChunkUtil;
 import de.bsommerfeld.pathetic.engine.util.ErrorLogger;
 import java.util.Optional;
-import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -35,7 +34,7 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
    */
   private static ChunkSnapshot retrieveChunkSnapshot(
       BukkitEnvironmentContext environmentContext, int chunkX, int chunkZ) {
-    World bukkitWorld = Bukkit.getWorld(environmentContext.getWorldUID());
+    World bukkitWorld = environmentContext.getWorld();
     return CHUNK_DATA_PROVIDER_RESOLVER
         .getChunkDataProvider()
         .getSnapshot(bukkitWorld, chunkX, chunkZ);
@@ -68,7 +67,7 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
                     + ", "
                     + chunkZ
                     + ") in world: "
-                    + environmentContext.getWorldUID());
+                    + environmentContext.getWorld().getName());
           }
 
           processChunkSnapshot(environmentContext, chunkX, chunkZ, chunkSnapshot);

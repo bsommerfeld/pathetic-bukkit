@@ -1,8 +1,8 @@
 package de.bsommerfeld.pathetic.bukkit;
 
-import de.bsommerfeld.pathetic.engine.Pathetic;
 import de.bsommerfeld.pathetic.bukkit.listener.ChunkInvalidateListener;
 import de.bsommerfeld.pathetic.bukkit.util.BukkitVersionUtil;
+import de.bsommerfeld.pathetic.engine.Pathetic;
 import de.bsommerfeld.pathetic.engine.util.ErrorLogger;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +25,6 @@ public class PatheticBukkit {
     instance = javaPlugin;
     Bukkit.getPluginManager().registerEvents(new ChunkInvalidateListener(), javaPlugin);
 
-    Pathetic.loadEngineVersion();
-
     if (BukkitVersionUtil.getVersion().isUnder(16, 0)
         || BukkitVersionUtil.getVersion().isEqual(BukkitVersionUtil.Version.of(16, 0))) {
       log.warn(
@@ -34,7 +32,7 @@ public class PatheticBukkit {
               + "Some functionalities might not be accessible, such as accessing the BlockState of blocks.");
     }
 
-    log.debug("Pathetic v{} initialized", Pathetic.getEngineVersion());
+    log.debug("Pathetic v{} initialized", Pathetic.getOrLoadEngineVersion());
   }
 
   public static boolean isInitialized() {
