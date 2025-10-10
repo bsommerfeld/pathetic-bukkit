@@ -10,7 +10,7 @@
     <version>${revision}</version>
 
     <properties>
-        <revision>5.3.0</revision>
+        <revision>5.3.1</revision>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,6 +41,7 @@
         <module>provider/spigot/v1_21_R4</module>
         <module>provider/spigot/v1_21_R5</module>
         <module>provider/resolver</module>
+        <module>provider/spigot/v1_21_R6</module>
     </modules>
 
     <build>
