@@ -14,17 +14,13 @@
     <version>${revision}</version>
 
     <properties>
-        <pathetic.version>5.3.2</pathetic.version>
+        <pathetic.version>5.4.0</pathetic.version>
     </properties>
 
     <repositories>
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -48,7 +44,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.bsommerfeld.pathetic</groupId>
+            <groupId>de.bsommerfeld.pathetic</groupId>
             <artifactId>engine</artifactId>
             <version>${pathetic.version}</version>
             <exclusions>
@@ -59,7 +55,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.github.bsommerfeld.pathetic</groupId>
+            <groupId>de.bsommerfeld.pathetic</groupId>
             <artifactId>api</artifactId>
             <version>${pathetic.version}</version>
         </dependency>
