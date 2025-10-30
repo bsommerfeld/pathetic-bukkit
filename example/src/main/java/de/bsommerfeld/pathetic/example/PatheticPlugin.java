@@ -11,7 +11,6 @@ import de.bsommerfeld.pathetic.bukkit.provider.LoadingNavigationPointProvider;
 import de.bsommerfeld.pathetic.engine.factory.AStarPathfinderFactory;
 import de.bsommerfeld.pathetic.example.command.PatheticCommand;
 import de.bsommerfeld.pathetic.example.listener.ChunkInvalidateListener;
-import de.bsommerfeld.pathetic.example.processor.SimpleCostProcessor;
 import de.bsommerfeld.pathetic.example.processor.SimpleValidationProcessor;
 import java.util.List;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,7 +38,6 @@ public final class PatheticPlugin extends JavaPlugin {
             .provider(new LoadingNavigationPointProvider()) // For loading chunks
             .fallback(true) // Allow fallback strategies if the primary fails
             .nodeValidationProcessors(List.of(new SimpleValidationProcessor()))
-            .nodeCostProcessors(List.of(new SimpleCostProcessor()))
             .async(true)
             .heuristicStrategy(HeuristicStrategies.SQUARED)
             // a higher count allows for more freedom, but also increases

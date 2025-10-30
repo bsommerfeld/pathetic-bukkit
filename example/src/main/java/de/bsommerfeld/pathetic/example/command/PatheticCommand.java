@@ -76,6 +76,8 @@ public class PatheticCommand implements TabExecutor {
         // Inform the player that pathfinding is starting
         player.sendMessage("Starting pathfinding... [Distance: " + start.distance(target) + "]");
 
+        final long startStamp = System.nanoTime();
+
         /*
          * Initiate pathfinding with the start and target positions. This is where the magic happens
          * and where all the configuration stuff we initialized before does their job.
@@ -89,6 +91,10 @@ public class PatheticCommand implements TabExecutor {
         // Handle the pathfinding result
         pathfindingResult.thenAccept(
             result -> {
+              final long endStamp = System.nanoTime();
+              final long timeMs = (endStamp - startStamp) / 1_000_000;
+
+              player.sendMessage("Time elapsed: " + timeMs + "ms");
               player.sendMessage("State: " + result.getPathState().name());
               player.sendMessage("Path length: " + result.getPath().length());
 
