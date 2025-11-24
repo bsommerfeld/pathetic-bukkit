@@ -1,6 +1,5 @@
 package de.bsommerfeld.pathetic.bukkit.provider.world;
 
-import de.bsommerfeld.pathetic.engine.util.ExpiringHashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.bukkit.ChunkSnapshot;
