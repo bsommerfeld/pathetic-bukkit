@@ -1,15 +1,15 @@
 package de.bsommerfeld.pathetic.example.processor;
 
 import de.bsommerfeld.pathetic.api.pathing.processing.Cost;
-import de.bsommerfeld.pathetic.api.pathing.processing.NodeCostProcessor;
-import de.bsommerfeld.pathetic.api.pathing.processing.context.NodeEvaluationContext;
+import de.bsommerfeld.pathetic.api.pathing.processing.CostProcessor;
+import de.bsommerfeld.pathetic.api.pathing.processing.context.EvaluationContext;
 import de.bsommerfeld.pathetic.api.provider.NavigationPointProvider;
 import de.bsommerfeld.pathetic.bukkit.provider.BukkitNavigationPoint;
 import org.bukkit.Material;
 
 /**
- * The SimpleCostProcessor class implements the NodeCostProcessor interface and provides a custom
- * cost calculation mechanism for navigation nodes.
+ * The SimpleCostProcessor class implements the CostProcessor interface and provides a custom cost
+ * calculation mechanism for navigation nodes.
  *
  * <p>The cost calculation is based on the material found directly beneath the current node's
  * position. Specifically, the cost increases by a predefined value if the underlying block is made
@@ -18,10 +18,10 @@ import org.bukkit.Material;
  * <p>This processor contributes to the overall cost in the pathfinding process based on the
  * evaluation of terrains and their attributes.
  */
-public class SimpleCostProcessor implements NodeCostProcessor {
+public class SimpleCostProcessor implements CostProcessor {
 
   @Override
-  public Cost calculateCostContribution(NodeEvaluationContext context) {
+  public Cost calculateCostContribution(EvaluationContext context) {
     NavigationPointProvider provider = context.getNavigationPointProvider();
 
     BukkitNavigationPoint beneath =

@@ -1,13 +1,13 @@
 package de.bsommerfeld.pathetic.bukkit.processor.validation;
 
 import de.bsommerfeld.pathetic.api.pathing.context.EnvironmentContext;
-import de.bsommerfeld.pathetic.api.pathing.processing.NodeValidationProcessor;
-import de.bsommerfeld.pathetic.api.pathing.processing.context.NodeEvaluationContext;
+import de.bsommerfeld.pathetic.api.pathing.processing.ValidationProcessor;
+import de.bsommerfeld.pathetic.api.pathing.processing.context.EvaluationContext;
 import de.bsommerfeld.pathetic.api.provider.NavigationPointProvider;
 import de.bsommerfeld.pathetic.api.wrapper.PathPosition;
 import de.bsommerfeld.pathetic.bukkit.provider.BukkitNavigationPoint;
 
-public class WalkableProcessor implements NodeValidationProcessor {
+public class WalkableProcessor implements ValidationProcessor {
 
   private final double height;
 
@@ -16,7 +16,7 @@ public class WalkableProcessor implements NodeValidationProcessor {
   }
 
   @Override
-  public boolean isValid(NodeEvaluationContext nodeEvaluationContext) {
+  public boolean isValid(EvaluationContext nodeEvaluationContext) {
     PathPosition pathPosition = nodeEvaluationContext.getCurrentPathPosition();
     PathPosition underPosition = nodeEvaluationContext.getCurrentPathPosition().subtract(0, 1, 0);
 

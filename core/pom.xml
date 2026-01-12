@@ -14,7 +14,7 @@
     <version>${revision}</version>
 
     <properties>
-        <pathetic.version>5.4.0</pathetic.version>
+        <pathetic.version>5.4.1</pathetic.version>
     </properties>
 
     <repositories>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.21.10-R0.1-SNAPSHOT</version>
+            <version>1.21.11-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

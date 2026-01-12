@@ -19,6 +19,7 @@ import de.bsommerfeld.pathetic.provider.v1_21_R3ChunkDataProviderImpl;
 import de.bsommerfeld.pathetic.provider.v1_21_R4ChunkDataProviderImpl;
 import de.bsommerfeld.pathetic.provider.v1_21_R5ChunkDataProviderImpl;
 import de.bsommerfeld.pathetic.provider.v1_21_R6ChunkDataProviderImpl;
+import de.bsommerfeld.pathetic.provider.v1_21_R7ChunkDataProviderImpl;
 import de.bsommerfeld.pathetic.provider.v1_8.v1_8ChunkDataProviderImpl;
 
 public class SpigotChunkDataProviderResolver {
@@ -31,6 +32,10 @@ public class SpigotChunkDataProviderResolver {
     final ChunkDataProvider chunkDataProvider;
     switch (major) {
       case 21:
+        if (minor == 11) {
+          chunkDataProvider = new v1_21_R7ChunkDataProviderImpl();
+          break;
+        }
         if (minor == 9 || minor == 10) {
           chunkDataProvider = new v1_21_R6ChunkDataProviderImpl();
           break;
