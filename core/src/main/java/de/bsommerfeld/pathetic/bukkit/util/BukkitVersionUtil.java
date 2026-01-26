@@ -13,7 +13,7 @@ public class BukkitVersionUtil {
   private static final double CURRENT_MINOR;
 
   static {
-    Pattern pattern = Pattern.compile(".*\\(.*MC.\\s*([a-zA-z0-9\\-.]+)\\s*\\)");
+    Pattern pattern = Pattern.compile(".*\\(MC:\\s*([0-9]+\\.[0-9]+(?:\\.[0-9]+)?).*\\)");
     Matcher matcher = pattern.matcher(Bukkit.getVersion());
 
     if (!matcher.matches() || matcher.group(1) == null) {
@@ -44,13 +44,13 @@ public class BukkitVersionUtil {
     private final double major;
     private final double minor;
 
-    public static Version of(double major, double minor) {
-      return new Version(major, minor);
-    }
-
     public Version(double major, double minor) {
       this.major = major;
       this.minor = minor;
+    }
+
+    public static Version of(double major, double minor) {
+      return new Version(major, minor);
     }
 
     public boolean isUnder(double major, double minor) {
