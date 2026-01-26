@@ -55,7 +55,7 @@ public class PatheticBukkit {
   private static void initializeBStats(Plugin javaPlugin) {
     Metrics metrics = new Metrics(javaPlugin, BSTATS_ID);
     metrics.addCustomChart(new SimplePie("pathetic_version", Pathetic::getOrLoadEngineVersion));
-    metrics.addCustomChart(new SingleLineChart("paths_searched", BStatsUtil::getPathsSearched));
-    metrics.addCustomChart(new SingleLineChart("path_distance", BStatsUtil::getPathDistance));
+    metrics.addCustomChart(
+        new SingleLineChart("pathfinding_steps", BStatsUtil::getPathfindingSteps));
   }
 }
