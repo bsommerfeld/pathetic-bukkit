@@ -15,6 +15,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 public class ChunkInvalidateListener implements Listener {
 
@@ -73,6 +74,11 @@ public class ChunkInvalidateListener implements Listener {
     Block block = event.getBlock();
     FailingNavigationPointProvider.invalidateChunk(
         block.getWorld().getUID(), block.getChunk().getX(), block.getChunk().getZ());
+  }
+
+  @EventHandler
+  public void onUnloadWorld(WorldUnloadEvent event) {
+    FailingNavigationPointProvider.invalidateAllChunks(event.getWorld().getUID());
   }
 
   private void handleEvent(Block... blocks) {

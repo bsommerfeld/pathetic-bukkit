@@ -73,6 +73,16 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
   }
 
   /**
+   * Invalidates all cached chunk snapshots for the specified world. This method should be called
+   * when a world is unloaded or when significant changes occur that affect the entire world.
+   *
+   * @param worldUUID The UUID of the world.
+   */
+  public static void invalidateAllChunks(UUID worldUUID) {
+    SNAPSHOTS_MAP.remove(worldUUID);
+  }
+
+  /**
    * Fetches the navigation point data at the given position. This method retrieves the chunk
    * snapshot containing the position and extracts the relevant information, such as the material
    * and block state.
