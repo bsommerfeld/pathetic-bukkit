@@ -4,7 +4,7 @@ main: de.bsommerfeld.pathetic.example.PatheticPlugin
 api-version: 1.21
 authors:
   - olijeffers0n
-  - Metaphoriker
+  - bsommerfeld
 
 commands:
   pathetic:
