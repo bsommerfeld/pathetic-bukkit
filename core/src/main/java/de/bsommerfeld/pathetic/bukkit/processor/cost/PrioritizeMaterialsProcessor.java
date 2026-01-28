@@ -11,6 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 import org.bukkit.Material;
 
+/**
+ * A cost processor that calculates a cost contribution based on the presence of specific materials
+ * at a navigation point. If the material at the current position matches any of the prioritized
+ * materials, the specified cost is applied. Otherwise, no cost is contributed.
+ */
 public class PrioritizeMaterialsProcessor implements CostProcessor {
 
   private static final double DEFAULT_COST = 20.0;
@@ -18,11 +23,24 @@ public class PrioritizeMaterialsProcessor implements CostProcessor {
   private final Set<Material> materials = new HashSet<>();
   private final double cost;
 
+  /**
+   * Constructs a new PrioritizeMaterialsProcessor with the specified cost and materials.
+   *
+   * @param cost the cost to be applied if the current material matches any of the prioritized
+   *     materials
+   * @param materials the materials to prioritize, which determine if the cost should be applied
+   */
   public PrioritizeMaterialsProcessor(double cost, Material... materials) {
     this.cost = cost;
     this.materials.addAll(Arrays.asList(materials));
   }
 
+  /**
+   * Constructs a new PrioritizeMaterialsProcessor with the default cost (20.0) and the specified
+   * materials.
+   *
+   * @param materials the materials to prioritize, which determine if the cost should be applied
+   */
   public PrioritizeMaterialsProcessor(Material... materials) {
     this(DEFAULT_COST, materials);
   }
