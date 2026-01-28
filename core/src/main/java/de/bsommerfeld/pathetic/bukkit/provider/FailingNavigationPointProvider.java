@@ -23,8 +23,8 @@ import org.bukkit.block.BlockState;
 /**
  * The {@code FailingNavigationPointProvider} class implements the {@link NavigationPointProvider}
  * interface and provides a default implementation for retrieving navigation point data from a
- * Minecraft world. It utilizes chunk snapshots to efficiently access information, even in
- * asynchronous contexts.
+ * Minecraft world. It uses chunk snapshots to efficiently access information, even in asynchronous
+ * contexts.
  *
  * <p>This provider also uses NMS (net.minecraft.server) utilities to bypass the Spigot AsyncCatcher
  * and fetch snapshots natively from an asynchronous context. This allows for more flexible and

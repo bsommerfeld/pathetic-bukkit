@@ -43,7 +43,7 @@ public class BukkitMapper {
    */
   @NonNull
   public PathPosition createPathPosition(double x, double y, double z) {
-    return new PathPosition(x, y, z);
+    return PathPosition.of(x, y, z);
   }
 
   @NonNull
@@ -53,6 +53,6 @@ public class BukkitMapper {
 
   @NonNull
   public PathVector toPathVector(@NonNull Vector vector) {
-    return new PathVector(vector.getX(), vector.getY(), vector.getZ());
+    return PathVector.of(vector.getX(), vector.getY(), vector.getZ());
   }
 }

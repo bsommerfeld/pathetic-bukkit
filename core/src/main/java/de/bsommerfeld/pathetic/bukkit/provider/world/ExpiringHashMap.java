@@ -79,24 +79,6 @@ public class ExpiringHashMap<K, V> extends ConcurrentHashMap<K, ExpiringHashMap.
   }
 
   /**
-   * Returns the expiration time for entries in milliseconds.
-   *
-   * @return the expiration time in milliseconds
-   */
-  public long getExpirationTimeMs() {
-    return expirationTimeMs;
-  }
-
-  /**
-   * Returns the cleanup interval in milliseconds.
-   *
-   * @return the cleanup interval in milliseconds
-   */
-  public long getCleanupIntervalMs() {
-    return cleanupIntervalMs;
-  }
-
-  /**
    * Puts a value in the map with the default expiration time.
    *
    * @param key the key

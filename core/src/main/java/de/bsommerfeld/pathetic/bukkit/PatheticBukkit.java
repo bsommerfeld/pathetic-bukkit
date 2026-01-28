@@ -17,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 @UtilityClass
 public class PatheticBukkit {
 
-  private static int BSTATS_ID = 29080;
+  private static final int B_STATS_ID = 29080;
 
   private static JavaPlugin instance;
 
@@ -43,16 +43,18 @@ public class PatheticBukkit {
     log.debug("Pathetic v{} initialized", Pathetic.getOrLoadEngineVersion());
   }
 
+  @Deprecated
   public static boolean isInitialized() {
     return instance != null;
   }
 
+  @Deprecated
   public static JavaPlugin getPluginInstance() {
     return instance;
   }
 
   private static void initializeBStats(Plugin javaPlugin) {
-    Metrics metrics = new Metrics(javaPlugin, BSTATS_ID);
+    Metrics metrics = new Metrics(javaPlugin, B_STATS_ID);
     metrics.addCustomChart(new SimplePie("pathetic_version", Pathetic::getOrLoadEngineVersion));
     metrics.addCustomChart(
         new SingleLineChart("pathfinding_steps", BStatsUtil::getPathfindingSteps));

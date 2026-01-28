@@ -15,7 +15,7 @@ public class SpigotPathfindingHook implements PathfinderHook {
   }
 
   private void tickWatchdogIfNeeded(Depth depth) {
-    if (depth.getValue() % 500 == 0) {
+    if (depth.value() % 500 == 0) {
       WatchdogUtil.tickWatchdog();
     }
   }
