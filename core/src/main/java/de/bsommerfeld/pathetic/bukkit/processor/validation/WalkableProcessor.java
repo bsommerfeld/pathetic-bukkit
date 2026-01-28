@@ -18,7 +18,7 @@ public class WalkableProcessor implements ValidationProcessor {
   @Override
   public boolean isValid(EvaluationContext nodeEvaluationContext) {
     PathPosition pathPosition = nodeEvaluationContext.getCurrentPathPosition();
-    PathPosition underPosition = nodeEvaluationContext.getCurrentPathPosition().subtract(0, 1, 0);
+    PathPosition underPosition = pathPosition.subtract(0, 1, 0);
 
     NavigationPointProvider provider = nodeEvaluationContext.getNavigationPointProvider();
     EnvironmentContext environmentContext = nodeEvaluationContext.getEnvironmentContext();
