@@ -4,7 +4,6 @@ import de.bsommerfeld.pathetic.bukkit.listener.ChunkInvalidateListener;
 import de.bsommerfeld.pathetic.bukkit.util.BStatsUtil;
 import de.bsommerfeld.pathetic.bukkit.util.BukkitVersionUtil;
 import de.bsommerfeld.pathetic.engine.Pathetic;
-import de.bsommerfeld.pathetic.engine.util.ErrorLogger;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.bstats.bukkit.Metrics;
@@ -27,7 +26,7 @@ public class PatheticBukkit {
    */
   public static void initialize(JavaPlugin javaPlugin) {
 
-    if (instance != null) throw ErrorLogger.logFatalError("Can't be initialized twice");
+    if (instance != null) throw new IllegalStateException("Can't be initialized twice");
 
     instance = javaPlugin;
     Bukkit.getPluginManager().registerEvents(new ChunkInvalidateListener(), javaPlugin);

@@ -1,6 +1,5 @@
 package de.bsommerfeld.pathetic.bukkit.util;
 
-import de.bsommerfeld.pathetic.engine.util.ErrorLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import lombok.SneakyThrows;
@@ -22,7 +21,7 @@ public class ChunkUtil {
             ChunkSnapshot.class.getDeclaredMethod(
                 "getBlockTypeId", int.class, int.class, int.class);
       } catch (NoSuchMethodException e) {
-        throw ErrorLogger.logFatalError(e.getMessage(), e);
+        throw new IllegalStateException(e);
       }
     }
   }
@@ -36,11 +35,11 @@ public class ChunkUtil {
   public Material getMaterial(ChunkSnapshot snapshot, int x, int y, int z) {
     if (BukkitVersionUtil.getVersion().isUnder(13, 0)) {
       if (materialMethod == null || blockTypeMethod == null)
-        throw ErrorLogger.logFatalError("Reflection Failure");
+        throw new IllegalStateException("Reflection Failure");
       try {
         return (Material) materialMethod.invoke(null, blockTypeMethod.invoke(snapshot, x, y, z));
       } catch (IllegalAccessException | InvocationTargetException e) {
-        throw ErrorLogger.logFatalError(e.getMessage(), e);
+        throw new IllegalStateException(e);
       }
     }
     return snapshot.getBlockType(x, y, z);

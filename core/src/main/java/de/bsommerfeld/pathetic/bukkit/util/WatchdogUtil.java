@@ -1,6 +1,5 @@
 package de.bsommerfeld.pathetic.bukkit.util;
 
-import de.bsommerfeld.pathetic.engine.util.ErrorLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import lombok.experimental.UtilityClass;
@@ -17,7 +16,7 @@ public class WatchdogUtil {
       watchdogClazz = Class.forName("org.spigotmc.WatchdogThread");
       tickMethod = watchdogClazz.getDeclaredMethod("tick");
     } catch (ClassNotFoundException | NoSuchMethodException e) {
-      throw ErrorLogger.logFatalError(e.getMessage(), e);
+      throw new IllegalStateException(e);
     }
   }
 
@@ -27,7 +26,7 @@ public class WatchdogUtil {
         try {
           tickMethod.invoke(watchdogClazz);
         } catch (IllegalAccessException | InvocationTargetException e) {
-          throw ErrorLogger.logFatalError(e.getMessage(), e);
+          throw new IllegalStateException(e);
         }
       }
   }

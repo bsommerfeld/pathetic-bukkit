@@ -5,7 +5,6 @@ import de.bsommerfeld.pathetic.api.provider.NavigationPoint;
 import de.bsommerfeld.pathetic.api.wrapper.PathPosition;
 import de.bsommerfeld.pathetic.bukkit.context.BukkitEnvironmentContext;
 import de.bsommerfeld.pathetic.bukkit.util.ChunkUtil;
-import de.bsommerfeld.pathetic.engine.util.ErrorLogger;
 import java.util.Optional;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
@@ -61,13 +60,7 @@ public class LoadingNavigationPointProvider extends FailingNavigationPointProvid
           ChunkSnapshot chunkSnapshot = retrieveChunkSnapshot(environmentContext, chunkX, chunkZ);
 
           if (chunkSnapshot == null) {
-            throw ErrorLogger.logFatalError(
-                "Could not retrieve chunk snapshot for chunk at ("
-                    + chunkX
-                    + ", "
-                    + chunkZ
-                    + ") in world: "
-                    + environmentContext.getWorld().getName());
+            throw new IllegalStateException("Could not retrieve chunk snapshot for chunk at (" + chunkX + ", " + chunkZ + ") in world: " + environmentContext.getWorld().getName());
           }
 
           processChunkSnapshot(environmentContext, chunkX, chunkZ, chunkSnapshot);
