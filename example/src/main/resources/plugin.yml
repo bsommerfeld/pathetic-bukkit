@@ -3,8 +3,8 @@ version: '${project.version}'
 main: de.bsommerfeld.pathetic.example.PatheticPlugin
 api-version: 1.21
 authors:
-  - olijeffers0n
   - bsommerfeld
+  - olijeffers0n
 
 commands:
   pathetic:

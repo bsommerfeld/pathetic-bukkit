@@ -1,7 +1,7 @@
 package de.bsommerfeld.pathetic.example.command;
 
 import de.bsommerfeld.pathetic.api.pathing.Pathfinder;
-import de.bsommerfeld.pathetic.api.pathing.result.PathfinderResult;
+import de.bsommerfeld.pathetic.api.pathing.PathfindingSearch;
 import de.bsommerfeld.pathetic.api.wrapper.PathPosition;
 import de.bsommerfeld.pathetic.bukkit.context.BukkitEnvironmentContext;
 import de.bsommerfeld.pathetic.bukkit.mapper.BukkitMapper;
@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletionStage;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -85,33 +84,36 @@ public class PatheticCommand implements TabExecutor {
          * Since 5.1.0: Here we have to give the findPath method a new BukkitEnvironmentContext,
          * which effectively gives the Pathfinder information about the world (or THE world).
          */
-        CompletionStage<PathfinderResult> pathfindingResult =
+        PathfindingSearch pathfindingSearch =
             pathfinder.findPath(start, target, new BukkitEnvironmentContext(player.getWorld()));
 
         // Handle the pathfinding result
-        pathfindingResult.thenAccept(
-            result -> {
-              final long endStamp = System.nanoTime();
-              final long timeMs = (endStamp - startStamp) / 1_000_000;
+        pathfindingSearch
+            .ifPresent(
+                result -> {
+                  final long endStamp = System.nanoTime();
+                  final long timeMs = (endStamp - startStamp) / 1_000_000;
 
-              player.sendMessage("Time elapsed: " + timeMs + "ms");
-              player.sendMessage("State: " + result.getPathState().name());
-              player.sendMessage("Path length: " + result.getPath().length());
+                  player.sendMessage("Time elapsed: " + timeMs + "ms");
+                  player.sendMessage("State: " + result.getPathState().name());
+                  player.sendMessage("Path length: " + result.getPath().length());
 
-              // If pathfinding is successful, show the path to the player
-              if (result.successful() || result.hasFallenBack()) {
-                result
-                    .getPath()
-                    .forEach(
-                        position -> {
-                          Location location = BukkitMapper.toLocation(position, player.getWorld());
-                          player.sendBlockChange(
-                              location, Material.YELLOW_STAINED_GLASS.createBlockData());
-                        });
-              } else {
-                player.sendMessage("Path not found!");
-              }
-            });
+                  result
+                      .getPath()
+                      .forEach(
+                          position -> {
+                            Location location =
+                                BukkitMapper.toLocation(position, player.getWorld());
+                            player.sendBlockChange(
+                                location, Material.YELLOW_STAINED_GLASS.createBlockData());
+                          });
+                })
+            .orElse(result -> player.sendMessage("Path not found!"));
+
+        // If you need to abort the pathfinding, you can cancel the search by calling
+        // NOTE: This will abort the operation exceptionally
+        pathfindingSearch.abort();
+
         break;
 
       default:
