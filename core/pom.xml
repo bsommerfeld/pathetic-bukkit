@@ -14,7 +14,7 @@
     <version>${revision}</version>
 
     <properties>
-        <pathetic.version>5.4.4</pathetic.version>
+        <pathetic.version>5.4.5</pathetic.version>
     </properties>
 
     <repositories>
