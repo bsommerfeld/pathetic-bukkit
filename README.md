@@ -1,6 +1,7 @@
 # Pathetic Bukkit
 
-Pathetic is a high-performance A* pathfinding library for Minecraft servers, specifically designed for Bukkit, Spigot, and Paper. It provides a robust and flexible API for computing efficient paths within the Minecraft world.
+Pathetic is a high-performance A* pathfinding library for Minecraft servers, specifically designed for Bukkit, Spigot,
+and Paper. It provides a robust and flexible API for computing efficient paths within the Minecraft world.
 
 ## Features
 
@@ -22,6 +23,7 @@ Paper and Spigot are explicitly supported. Other server implementations may work
 ### Maven
 
 ```xml
+
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -30,11 +32,11 @@ Paper and Spigot are explicitly supported. Other server implementations may work
 </repositories>
 
 <dependencies>
-    <dependency>
-        <groupId>com.github.bsommerfeld.pathetic-bukkit</groupId>
-        <artifactId>core</artifactId>
-        <version>VERSION</version>
-    </dependency>
+<dependency>
+    <groupId>com.github.bsommerfeld.pathetic-bukkit</groupId>
+    <artifactId>core</artifactId>
+    <version>VERSION</version>
+</dependency>
 </dependencies>
 ```
 
@@ -56,6 +58,7 @@ dependencies {
 <summary>Maven Shade Relocation</summary>
 
 ```xml
+
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-shade-plugin</artifactId>
@@ -70,6 +73,7 @@ dependencies {
     </configuration>
 </plugin>
 ```
+
 </details>
 
 <details>
@@ -80,6 +84,7 @@ shadowJar {
     relocate 'de.bsommerfeld.pathetic', 'your.package.pathetic'
 }
 ```
+
 </details>
 
 ## Quick Start
@@ -113,18 +118,15 @@ import de.bsommerfeld.pathetic.engine.factory.AStarPathfinderFactory;
 // Create the PathfinderFactory
 PathfinderFactory factory = new AStarPathfinderFactory();
 
-// Create the initializer
-PathfinderInitializer initializer = new BukkitPathfinderInitializer();
+        // Configure the pathfinder
+        PathfinderConfiguration configuration = PathfinderConfiguration.builder()
+                .provider(new LoadingNavigationPointProvider())
+                .async(true)
+                .maxIterations(100_000_000)
+                .build();
 
-// Configure the pathfinder
-PathfinderConfiguration configuration = PathfinderConfiguration.builder()
-    .provider(new LoadingNavigationPointProvider())
-    .async(true)
-    .maxIterations(100_000_000)
-    .build();
-
-// Create the pathfinder instance
-Pathfinder pathfinder = factory.createPathfinder(configuration, initializer);
+        // Create the pathfinder instance
+        Pathfinder pathfinder = factory.createPathfinder(configuration);
 ```
 
 ### 3. Calculate a Path
@@ -141,24 +143,26 @@ Location target = ...;
 PathPosition startPos = BukkitMapper.toPathPosition(start);
 PathPosition targetPos = BukkitMapper.toPathPosition(target);
 
-pathfinder.findPath(startPos, targetPos, new BukkitEnvironmentContext(world))
-    .thenAccept(result -> {
-        if (result.successful()) {
-            // Path was found successfully
-            result.getPath().forEach(position -> {
-                Location location = BukkitMapper.toLocation(position, world);
-                // Process path positions...
+pathfinder.
+
+findPath(startPos, targetPos, new BukkitEnvironmentContext(world))
+        .
+
+ifPresent(result ->{
+        result.getPath.
+
+forEach(position ->{
+Location location = BukkitMapper.toLocation(position, world);
+// Do something with it.
             });
-        } else if (result.hasFallenBack()) {
-            // Partial path found via fallback strategy
-            result.getPath().forEach(position -> {
-                // Process fallback path...
-            });
-        } else {
-            // No path found
-            System.out.println("Pathfinding failed: " + result.getPathState());
-        }
-    });
+                    }).
+
+orElse(_ ->{
+        // Handle no path found scenario
+        System.out.
+
+println("No path found between start and target positions.");
+        })
 ```
 
 ## Advanced Usage
@@ -181,10 +185,10 @@ public class CustomCostProcessor implements CostProcessor {
         NavigationPointProvider provider = context.getNavigationPointProvider();
 
         BukkitNavigationPoint beneath = (BukkitNavigationPoint)
-            provider.getNavigationPoint(
-                context.getCurrentPathPosition().subtract(0, 1, 0),
-                context.getEnvironmentContext()
-            );
+                provider.getNavigationPoint(
+                        context.getCurrentPathPosition().subtract(0, 1, 0),
+                        context.getEnvironmentContext()
+                );
 
         if (beneath.getMaterial() == Material.STONE) {
             return Cost.of(20);
@@ -199,9 +203,9 @@ Add the processor to your configuration:
 
 ```java
 PathfinderConfiguration configuration = PathfinderConfiguration.builder()
-    .provider(new LoadingNavigationPointProvider())
-    .costProcessors(List.of(new CustomCostProcessor()))
-    .build();
+        .provider(new LoadingNavigationPointProvider())
+        .costProcessors(List.of(new CustomCostProcessor()))
+        .build();
 ```
 
 ### Custom Validation Processors
@@ -225,23 +229,27 @@ Add to configuration:
 
 ```java
 PathfinderConfiguration configuration = PathfinderConfiguration.builder()
-    .provider(new LoadingNavigationPointProvider())
-    .nodeValidationProcessors(List.of(new CustomValidationProcessor()))
-    .build();
+        .provider(new LoadingNavigationPointProvider())
+        .nodeValidationProcessors(List.of(new CustomValidationProcessor()))
+        .build();
 ```
 
 ### Configuration Options
 
 ```java
 PathfinderConfiguration configuration = PathfinderConfiguration.builder()
-    .provider(new LoadingNavigationPointProvider())
-    .async(true)                                    // Enable async pathfinding
-    .fallback(true)                                 // Enable fallback strategies
-    .maxIterations(100_000_000)                     // Maximum nodes to evaluate
-    .heuristicStrategy(HeuristicStrategies.SQUARED) // Heuristic calculation
-    .costProcessors(List.of(...))                   // Custom cost processors
-    .nodeValidationProcessors(List.of(...))         // Custom validation processors
-    .build();
+        .provider(new LoadingNavigationPointProvider())
+        .async(true)                                    // Enable async pathfinding
+        .fallback(true)                                 // Enable fallback strategies
+        .maxIterations(100_000_000)                     // Maximum nodes to evaluate
+        .heuristicStrategy(HeuristicStrategies.SQUARED) // Heuristic calculation
+        .costProcessors(List.of(...))                   // Custom cost processors
+        .
+
+nodeValidationProcessors(List.of(...))         // Custom validation processors
+        .
+
+build();
 ```
 
 ## Navigation Point Providers
@@ -256,7 +264,9 @@ Pathetic provides two built-in providers:
 .provider(new LoadingNavigationPointProvider())
 
 // Without automatic chunk loading
-.provider(new FailingNavigationPointProvider())
+        .
+
+provider(new FailingNavigationPointProvider())
 ```
 
 ## Performance Considerations
@@ -269,7 +279,8 @@ Pathetic provides two built-in providers:
 
 ## Examples
 
-See the [example module](https://github.com/bsommerfeld/pathetic-bukkit/tree/trunk/example) for complete working implementations, including:
+See the [example module](https://github.com/bsommerfeld/pathetic-bukkit/tree/trunk/example) for complete working
+implementations, including:
 
 - Basic pathfinding setup
 - Custom cost and validation processors
@@ -286,4 +297,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-For issues and feature requests, please use the [GitHub Issues](https://github.com/bsommerfeld/pathetic-bukkit/issues) page.
+For issues and feature requests, please use the [GitHub Issues](https://github.com/bsommerfeld/pathetic-bukkit/issues)
+page.
