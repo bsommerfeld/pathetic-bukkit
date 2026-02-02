@@ -137,32 +137,39 @@ import de.bsommerfeld.pathetic.bukkit.context.BukkitEnvironmentContext;
 import de.bsommerfeld.pathetic.bukkit.mapper.BukkitMapper;
 import org.bukkit.Location;
 
-Location start = ...;
-Location target = ...;
+class PathfindingExample {
 
-PathPosition startPos = BukkitMapper.toPathPosition(start);
-PathPosition targetPos = BukkitMapper.toPathPosition(target);
+    private final Pathfinder pathfinder;
 
-pathfinder.
+    public PathfindingExample(Pathfinder pathfinder) {
+        this.pathfinder = pathfinder;
+    }
 
-findPath(startPos, targetPos, new BukkitEnvironmentContext(world))
-        .
+    private void findPath(Location start, Location target) {
 
-ifPresent(result ->{
-        result.getPath.
+        PathPosition startPos = BukkitMapper.toPathPosition(start);
+        PathPosition targetPos = BukkitMapper.toPathPosition(target);
 
-forEach(position ->{
-Location location = BukkitMapper.toLocation(position, world);
-// Do something with it.
-            });
-                    }).
+        pathfinder.findPath(startPos, targetPos, new BukkitEnvironmentContext(world))
+                .ifPresent(result -> {
 
-orElse(_ ->{
-        // Handle no path found scenario
-        System.out.
+                    // We have an usable result since it either found the path, or fallen back.
+                    result.getPath.forEach(position -> {
+                        Location location = BukkitMapper.toLocation(position, world);
+                        // Do something with it.
+                    });
 
-println("No path found between start and target positions.");
-        })
+                }).orElse(_ -> {
+                    // Handle no path found scenario
+                    System.out.println("No path found between start and target positions.");
+
+                }).exceptionally(ex -> System.err.println("An exception occurred -> " + ex));
+    }
+}
+
+Location start = new Location(world, 1, 2, 3);
+Location target = new Location(world, 2, 3, 4);
+
 ```
 
 ## Advanced Usage
