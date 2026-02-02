@@ -166,10 +166,6 @@ class PathfindingExample {
                 }).exceptionally(ex -> System.err.println("An exception occurred -> " + ex));
     }
 }
-
-Location start = new Location(world, 1, 2, 3);
-Location target = new Location(world, 2, 3, 4);
-
 ```
 
 ## Advanced Usage
