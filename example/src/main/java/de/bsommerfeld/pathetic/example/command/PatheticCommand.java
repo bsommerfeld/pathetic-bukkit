@@ -108,12 +108,15 @@ public class PatheticCommand implements TabExecutor {
                                 location, Material.YELLOW_STAINED_GLASS.createBlockData());
                           });
                 })
-            .orElse(result -> player.sendMessage("Path not found!"))
+            .orElse(
+                result -> {
+                  player.sendMessage("Path not found! Result: " + result.getPathState());
+                })
             .exceptionally(
                 ex -> System.err.println("Pathfinding operation ended exceptionally: " + ex));
 
         // If you need to abort the pathfinding, you can cancel the search by calling
-        pathfindingSearch.abort();
+        // pathfindingSearch.abort();
 
         break;
 

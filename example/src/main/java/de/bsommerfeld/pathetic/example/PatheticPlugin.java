@@ -34,13 +34,13 @@ public final class PatheticPlugin extends JavaPlugin {
             .fallback(true) // Allow fallback strategies if the primary fails
             .validationProcessors(List.of(new SimpleValidationProcessor()))
             .async(true)
-            .heuristicStrategy(HeuristicStrategies.LINEAR)
+            .heuristicStrategy(HeuristicStrategies.SQUARED)
             // You can register PathfindingHooks via the configuration.
             // For example, Spigot NEEDS this PathfindingHook to work asynchronously!
             .pathfindingHooks(List.of(new SpigotPathfindingHook()))
             // a higher count allows for more freedom, but also increases
             // computation / wait-time for failure
-            .maxIterations(100_000)
+            .maxIterations(1_000_000)
             .build();
 
     // There are many more options inside the configuration which are not covered here.
