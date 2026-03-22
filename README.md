@@ -267,9 +267,7 @@ Pathetic provides two built-in providers:
 .provider(new LoadingNavigationPointProvider())
 
 // Without automatic chunk loading
-        .
-
-provider(new FailingNavigationPointProvider())
+// .provider(new FailingNavigationPointProvider())
 ```
 
 ## Performance Considerations
