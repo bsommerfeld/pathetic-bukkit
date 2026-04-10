@@ -291,7 +291,8 @@ implementations, including:
 ## Documentation
 
 Complete JavaDoc documentation is available in the releases.
-+ See the [Pathetic Wiki](https://github.com/bsommerfeld/pathetic/wiki).
+<br>
+\+ See the [Pathetic Wiki](https://github.com/bsommerfeld/pathetic/wiki).
 
 ## License
 
