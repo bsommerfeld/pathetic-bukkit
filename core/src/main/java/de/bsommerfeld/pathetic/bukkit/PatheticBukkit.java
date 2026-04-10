@@ -33,11 +33,13 @@ public class PatheticBukkit {
 
     initializeBStats(javaPlugin);
 
-    if (BukkitVersionUtil.getVersion().isUnder(16, 0)
-        || BukkitVersionUtil.getVersion().isEqual(BukkitVersionUtil.Version.of(16, 0))) {
-      log.warn(
-          "Pathetic is currently running in a version older than or equal to 1.16. "
-              + "Some functionalities might not be accessible, such as accessing the BlockState of blocks.");
+    if (BukkitVersionUtil.isLegacyVersion()) {
+      BukkitVersionUtil.Version version = BukkitVersionUtil.getVersion();
+      if (version.isUnder(16, 0) || version.isEqual(BukkitVersionUtil.Version.of(16, 0))) {
+        log.warn(
+            "Pathetic is currently running in a version older than or equal to 1.16. "
+                + "Some functionalities might not be accessible, such as accessing the BlockState of blocks.");
+      }
     }
 
     log.debug("Pathetic v{} initialized", Pathetic.getOrLoadEngineVersion());

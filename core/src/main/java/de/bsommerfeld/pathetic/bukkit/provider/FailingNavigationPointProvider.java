@@ -50,9 +50,13 @@ public class FailingNavigationPointProvider implements NavigationPointProvider {
   protected static final ChunkDataProviderResolver CHUNK_DATA_PROVIDER_RESOLVER;
 
   static {
-    BukkitVersionUtil.Version version = BukkitVersionUtil.getVersion();
-    CHUNK_DATA_PROVIDER_RESOLVER =
-        new ChunkDataProviderResolver((int) version.getMajor(), (int) version.getMinor());
+    if (BukkitVersionUtil.isLegacyVersion()) {
+      BukkitVersionUtil.Version version = BukkitVersionUtil.getVersion();
+      CHUNK_DATA_PROVIDER_RESOLVER = new ChunkDataProviderResolver(version.getMajor(), version.getMinor());
+    } else {
+      BukkitVersionUtil.CalendarVersion version = BukkitVersionUtil.getCalendarVersion();
+      CHUNK_DATA_PROVIDER_RESOLVER = new ChunkDataProviderResolver(version.getYear(), version.getFeature(), version.getPatch());
+    }
   }
 
   /**

@@ -12,17 +12,24 @@ public class ChunkDataProviderResolver {
 
   private final ChunkDataProvider chunkDataProvider;
 
+  /** For legacy 1.X.Y Minecraft versions. */
   public ChunkDataProviderResolver(int major, int minor) {
-    String version = "1." + major + "." + minor;
-
     if (isPaper()) {
       chunkDataProvider = new PaperChunkDataProvider();
     } else {
       chunkDataProvider = SpigotChunkDataProviderResolver.resolve(major, minor);
     }
+    log.debug("Detected version 1.{}.{}, using {}", major, minor, chunkDataProvider.getClass().getSimpleName());
+  }
 
-    log.debug(
-        "Detected version v{}, using {}", version, chunkDataProvider.getClass().getSimpleName());
+  /** For calendar-versioned YY.X.Y Minecraft versions. */
+  public ChunkDataProviderResolver(int year, int feature, int patch) {
+    if (isPaper()) {
+      chunkDataProvider = new PaperChunkDataProvider();
+    } else {
+      chunkDataProvider = SpigotChunkDataProviderResolver.resolve(year, feature, patch);
+    }
+    log.debug("Detected version {}.{}.{}, using {}", year, feature, patch, chunkDataProvider.getClass().getSimpleName());
   }
 
   private boolean isPaper() {

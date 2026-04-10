@@ -21,6 +21,7 @@ import de.bsommerfeld.pathetic.provider.v1_21_R5ChunkDataProviderImpl;
 import de.bsommerfeld.pathetic.provider.v1_21_R6ChunkDataProviderImpl;
 import de.bsommerfeld.pathetic.provider.v1_21_R7ChunkDataProviderImpl;
 import de.bsommerfeld.pathetic.provider.v1_8.v1_8ChunkDataProviderImpl;
+import de.bsommerfeld.pathetic.provider.v26_1ChunkDataProviderImpl;
 
 public class SpigotChunkDataProviderResolver {
 
@@ -28,6 +29,18 @@ public class SpigotChunkDataProviderResolver {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
 
+  /** For calendar-versioned YY.X.Y Minecraft versions. */
+  public static ChunkDataProvider resolve(int year, int feature, int patch) {
+    switch (year) {
+      case 26:
+        return new v26_1ChunkDataProviderImpl();
+      default:
+        throw new IllegalArgumentException(
+            "Unsupported calendar version: " + year + "." + feature + "." + patch);
+    }
+  }
+
+  /** For legacy 1.X.Y Minecraft versions. */
   public static ChunkDataProvider resolve(int major, int minor) {
     final ChunkDataProvider chunkDataProvider;
     switch (major) {

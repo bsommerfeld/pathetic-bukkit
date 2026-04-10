@@ -14,7 +14,7 @@ public class ChunkUtil {
   private static Method blockTypeMethod;
 
   static {
-    if (BukkitVersionUtil.getVersion().isUnder(13, 0)) {
+    if (BukkitVersionUtil.isLegacyVersion() && BukkitVersionUtil.getVersion().isUnder(13, 0)) {
       try {
         materialMethod = Material.class.getDeclaredMethod("getMaterial", int.class);
         blockTypeMethod =
@@ -33,7 +33,7 @@ public class ChunkUtil {
   /** Get the block type from a chunk snapshot at the given coordinates */
   @SneakyThrows
   public Material getMaterial(ChunkSnapshot snapshot, int x, int y, int z) {
-    if (BukkitVersionUtil.getVersion().isUnder(13, 0)) {
+    if (BukkitVersionUtil.isLegacyVersion() && BukkitVersionUtil.getVersion().isUnder(13, 0)) {
       if (materialMethod == null || blockTypeMethod == null)
         throw new IllegalStateException("Reflection Failure");
       try {

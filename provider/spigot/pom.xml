@@ -37,6 +37,13 @@
 
         <dependency>
             <groupId>de.bsommerfeld</groupId>
+            <artifactId>v26_1</artifactId>
+            <version>${revision}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.bsommerfeld</groupId>
             <artifactId>v1_21_R7</artifactId>
             <version>${revision}</version>
             <scope>compile</scope>
