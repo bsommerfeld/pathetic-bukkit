@@ -21,7 +21,7 @@ public class BukkitVersionUtil {
     }
 
     String[] elements = matcher.group(1).split("\\.");
-    if (elements.length < 1) {
+    if (elements.length < 2) {
       throw new IllegalStateException("Invalid server version '" + matcher.group(1) + "'");
     }
 
@@ -30,8 +30,15 @@ public class BukkitVersionUtil {
       values[i] = Integer.parseInt(elements[i].trim());
     }
 
-    CURRENT_MAJOR = values[1];
-    CURRENT_MINOR = values[2];
+    // Old scheme: 1.X.Y  → major = X, minor = Y
+    // New scheme: YY.X.Y → major = YY, minor = X  (year-based, e.g. 26.1.1)
+    if (values[0] == 1) {
+      CURRENT_MAJOR = values[1];
+      CURRENT_MINOR = values[2];
+    } else {
+      CURRENT_MAJOR = values[0];
+      CURRENT_MINOR = values[1];
+    }
   }
 
   public static Version getVersion() {
