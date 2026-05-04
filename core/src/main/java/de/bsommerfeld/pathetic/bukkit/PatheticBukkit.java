@@ -10,6 +10,7 @@ import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,6 +21,8 @@ public class PatheticBukkit {
   private static final int B_STATS_ID = 29080;
 
   private static JavaPlugin instance;
+  private static Metrics metrics;
+  private static ChunkInvalidateListener chunkInvalidateListener;
 
   /**
    * @throws IllegalStateException If an attempt is made to initialize more than 1 time
@@ -29,7 +32,9 @@ public class PatheticBukkit {
     if (instance != null) throw new IllegalStateException("Can't be initialized twice");
 
     instance = javaPlugin;
-    Bukkit.getPluginManager().registerEvents(new ChunkInvalidateListener(), javaPlugin);
+
+    chunkInvalidateListener = new ChunkInvalidateListener();
+    Bukkit.getPluginManager().registerEvents(chunkInvalidateListener, javaPlugin);
 
     initializeBStats(javaPlugin);
 
@@ -45,6 +50,29 @@ public class PatheticBukkit {
     log.debug("Pathetic v{} initialized", Pathetic.getOrLoadEngineVersion());
   }
 
+  /**
+   * Releases all plugin-scoped resources allocated by {@link #initialize(JavaPlugin)}.
+   * <p>
+   * Safe to call from a plugin's onDisable hook or before reloading an isolated
+   * classloader. After this call, {@link #isInitialized()} returns false and
+   * {@link #initialize(JavaPlugin)} can be invoked again.
+   */
+  public static void shutdown() {
+    if (instance == null) return;
+
+    if (metrics != null) {
+      metrics.shutdown();
+      metrics = null;
+    }
+
+    if (chunkInvalidateListener != null) {
+      HandlerList.unregisterAll(chunkInvalidateListener);
+      chunkInvalidateListener = null;
+    }
+
+    instance = null;
+  }
+
   @Deprecated
   public static boolean isInitialized() {
     return instance != null;
@@ -56,7 +84,7 @@ public class PatheticBukkit {
   }
 
   private static void initializeBStats(Plugin javaPlugin) {
-    Metrics metrics = new Metrics(javaPlugin, B_STATS_ID);
+    metrics = new Metrics(javaPlugin, B_STATS_ID);
     metrics.addCustomChart(new SimplePie("pathetic_version", Pathetic::getOrLoadEngineVersion));
     metrics.addCustomChart(
         new SingleLineChart("pathfinding_steps", BStatsUtil::getPathfindingSteps));
