@@ -1,4 +1,4 @@
-# Pathetic Bukkit
+# Pathetic Bukkit ![Downloads](https://jitpack.io/v/bsommerfeld/pathetic-bukkit/month.svg)
 
 Pathetic is a high-performance A* pathfinding library for Minecraft servers, specifically designed for Bukkit, Spigot,
 and Paper. It provides a robust and flexible API for computing efficient paths within the Minecraft world.
@@ -100,6 +100,12 @@ public class MyPlugin extends JavaPlugin {
     public void onEnable() {
         // Initialize Pathetic with this plugin instance
         PatheticBukkit.initialize(this);
+    }
+
+    @Override
+    public void onDisable() {
+        // Make sure to shutdown Pathetic
+        PatheticBukkit.shutdown();
     }
 }
 ```
@@ -247,12 +253,8 @@ PathfinderConfiguration configuration = PathfinderConfiguration.builder()
         .maxIterations(100_000_000)                     // Maximum nodes to evaluate
         .heuristicStrategy(HeuristicStrategies.SQUARED) // Heuristic calculation
         .costProcessors(List.of(...))                   // Custom cost processors
-        .
-
-nodeValidationProcessors(List.of(...))         // Custom validation processors
-        .
-
-build();
+        .nodeValidationProcessors(List.of(...))         // Custom validation processors
+        .build();
 ```
 
 ## Navigation Point Providers
@@ -290,8 +292,6 @@ implementations, including:
 
 ## Documentation
 
-Complete JavaDoc documentation is available in the releases.
-<br>
 \+ See the [Pathetic Wiki](https://github.com/bsommerfeld/pathetic/wiki).
 
 ## License
