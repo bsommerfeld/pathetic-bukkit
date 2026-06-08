@@ -253,15 +253,9 @@ PathfinderConfiguration configuration = PathfinderConfiguration.builder()
         .maxIterations(100_000_000)                     // Maximum nodes to evaluate
         .heuristicStrategy(HeuristicStrategies.SQUARED) // Heuristic calculation
         .costProcessors(List.of(...))                   // Custom cost processors
-        .
-
-nodeValidationProcessors(List.of(...))         // Custom validation processors
-        .
-
-pathfindingHooks(List.of(new MetricsHook()))   // Opt-in hook to support development
-        .
-
-build();
+        .nodeValidationProcessors(List.of(...))         // Custom validation processors
+        .pathfindingHooks(List.of(new MetricsHook()))   // Opt-in hook to support development
+        .build();
 ```
 
 ## Navigation Point Providers
