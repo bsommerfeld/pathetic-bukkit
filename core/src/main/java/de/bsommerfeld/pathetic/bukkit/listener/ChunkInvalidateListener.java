@@ -70,20 +70,19 @@ public class ChunkInvalidateListener implements Listener {
   }
 
   @EventHandler
-  public void onChunkInvalidate(ChunkInvalidateEvent event) {
-    Block block = event.getBlock();
-    FailingNavigationPointProvider.invalidateChunk(
-        block.getWorld().getUID(), block.getChunk().getX(), block.getChunk().getZ());
-  }
-
-  @EventHandler
   public void onUnloadWorld(WorldUnloadEvent event) {
     FailingNavigationPointProvider.invalidateAllChunks(event.getWorld().getUID());
   }
 
   private void handleEvent(Block... blocks) {
     for (Block block : blocks) {
-      Bukkit.getPluginManager().callEvent(new ChunkInvalidateEvent(block));
+      ChunkInvalidateEvent event = new ChunkInvalidateEvent(block);
+      Bukkit.getPluginManager().callEvent(event);
+
+      if (!event.isCancelled()) {
+        FailingNavigationPointProvider.invalidateChunk(
+            block.getWorld().getUID(), block.getChunk().getX(), block.getChunk().getZ());
+      }
     }
   }
 }
