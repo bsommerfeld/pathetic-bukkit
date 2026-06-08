@@ -101,6 +101,12 @@ public class MyPlugin extends JavaPlugin {
         // Initialize Pathetic with this plugin instance
         PatheticBukkit.initialize(this);
     }
+
+    @Override
+    public void onDisable() {
+        // Make sure to shutdown Pathetic
+        PatheticBukkit.shutdown();
+    }
 }
 ```
 
