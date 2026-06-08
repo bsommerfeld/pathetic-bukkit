@@ -5,6 +5,7 @@ import de.bsommerfeld.pathetic.api.pathing.Pathfinder;
 import de.bsommerfeld.pathetic.api.pathing.configuration.PathfinderConfiguration;
 import de.bsommerfeld.pathetic.api.pathing.heuristic.HeuristicStrategies;
 import de.bsommerfeld.pathetic.bukkit.PatheticBukkit;
+import de.bsommerfeld.pathetic.bukkit.hook.MetricsHook;
 import de.bsommerfeld.pathetic.bukkit.hook.SpigotPathfindingHook;
 import de.bsommerfeld.pathetic.bukkit.provider.LoadingNavigationPointProvider;
 import de.bsommerfeld.pathetic.engine.factory.AStarPathfinderFactory;
@@ -34,10 +35,19 @@ public final class PatheticPlugin extends JavaPlugin {
             .fallback(true) // Allow fallback strategies if the primary fails
             .validationProcessors(List.of(new SimpleValidationProcessor()))
             .async(true)
+
+            // SQUARED is more performant, but less accurate. For "accurate as fuck" use LINEAR
             .heuristicStrategy(HeuristicStrategies.SQUARED)
-            // You can register PathfindingHooks via the configuration.
-            // For example, Spigot NEEDS this PathfindingHook to work asynchronously!
-            .pathfindingHooks(List.of(new SpigotPathfindingHook()))
+
+            /*
+             * You can register PathfindingHooks via the configuration.
+             * For example, Spigot NEEDS SpigotPathfindingHook to work asynchronously!
+             *
+             * The MetricsHook is an opt-in hook in order to help with development
+             * by providing generic data to https://bstats.org/plugin/bukkit/pathetic-bukkit/29080
+             */
+            .pathfindingHooks(List.of(new SpigotPathfindingHook(), new MetricsHook()))
+
             // a higher count allows for more freedom, but also increases
             // computation / wait-time for failure
             .maxIterations(1_000_000)
