@@ -3,11 +3,9 @@ package de.bsommerfeld.pathetic.bukkit;
 import de.bsommerfeld.pathetic.bukkit.listener.ChunkInvalidateListener;
 import de.bsommerfeld.pathetic.bukkit.util.BStatsUtil;
 import de.bsommerfeld.pathetic.bukkit.util.BukkitVersionUtil;
-import de.bsommerfeld.pathetic.engine.Pathetic;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -47,7 +45,7 @@ public class PatheticBukkit {
       }
     }
 
-    log.debug("Pathetic v{} initialized", Pathetic.getOrLoadEngineVersion());
+    log.debug("Pathetic initialized");
   }
 
   /**
@@ -85,7 +83,6 @@ public class PatheticBukkit {
 
   private static void initializeBStats(Plugin javaPlugin) {
     metrics = new Metrics(javaPlugin, B_STATS_ID);
-    metrics.addCustomChart(new SimplePie("pathetic_version", Pathetic::getOrLoadEngineVersion));
     metrics.addCustomChart(
         new SingleLineChart("pathfinding_steps", BStatsUtil::getPathfindingSteps));
   }
