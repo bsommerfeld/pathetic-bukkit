@@ -14,7 +14,7 @@
     <version>${revision}</version>
 
     <properties>
-        <pathetic.version>5.5.0</pathetic.version>
+        <pathetic.version>5.5.1</pathetic.version>
     </properties>
 
     <repositories>
@@ -53,12 +53,6 @@
             <groupId>de.bsommerfeld.pathetic</groupId>
             <artifactId>engine</artifactId>
             <version>${pathetic.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.bsommerfeld</groupId>

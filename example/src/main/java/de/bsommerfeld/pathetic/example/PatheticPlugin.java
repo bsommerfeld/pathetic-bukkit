@@ -61,7 +61,7 @@ public final class PatheticPlugin extends JavaPlugin {
     Pathfinder reusablePathfinder = factory.createPathfinder(configuration);
 
     // Register the command executors
-    getCommand("pathetic").setExecutor(new PatheticCommand(reusablePathfinder));
+    getCommand("pathetic").setExecutor(new PatheticCommand(this, reusablePathfinder));
 
     // Register the ChunkInvalidateListener
     getServer().getPluginManager().registerEvents(new ChunkInvalidateListener(), this);
