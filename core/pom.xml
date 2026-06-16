@@ -14,7 +14,7 @@
     <version>${revision}</version>
 
     <properties>
-        <pathetic.version>5.5.1</pathetic.version>
+        <pathetic.version>5.5.2</pathetic.version>
     </properties>
 
     <repositories>
@@ -63,6 +63,12 @@
         <dependency>
             <groupId>de.bsommerfeld</groupId>
             <artifactId>provider</artifactId>
+            <version>${revision}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.bsommerfeld</groupId>
+            <artifactId>world-reader</artifactId>
             <version>${revision}</version>
             <scope>compile</scope>
         </dependency>
