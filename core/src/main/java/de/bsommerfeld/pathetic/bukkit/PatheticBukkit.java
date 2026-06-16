@@ -1,6 +1,10 @@
 package de.bsommerfeld.pathetic.bukkit;
 
 import de.bsommerfeld.pathetic.bukkit.listener.ChunkInvalidateListener;
+import de.bsommerfeld.pathetic.bukkit.provider.FailingNavigationPointProvider;
+import de.bsommerfeld.pathetic.bukkit.provider.anvil.AnvilChunkLoader;
+import de.bsommerfeld.pathetic.bukkit.provider.world.CacheSweeper;
+import de.bsommerfeld.pathetic.bukkit.provider.world.ChunkPrefetcher;
 import de.bsommerfeld.pathetic.bukkit.util.BStatsUtil;
 import de.bsommerfeld.pathetic.bukkit.util.BukkitVersionUtil;
 import lombok.experimental.UtilityClass;
@@ -23,13 +27,35 @@ public class PatheticBukkit {
   private static ChunkInvalidateListener chunkInvalidateListener;
 
   /**
+   * Initializes Pathetic with the default chunk-cache configuration.
+   *
+   * <p><strong>You must call {@link #shutdown()} from your plugin's {@code onDisable}.</strong>
+   * Pathetic holds JVM-lifetime shared state — background threads and a static chunk cache — that
+   * are <em>not</em> tied to any individual {@code Pathfinder}; without {@code shutdown()} they leak
+   * across a plugin reload.
+   *
    * @throws IllegalStateException If an attempt is made to initialize more than 1 time
    */
   public static void initialize(JavaPlugin javaPlugin) {
+    initialize(javaPlugin, ChunkCacheConfiguration.defaults());
+  }
+
+  /**
+   * Initializes Pathetic with a custom chunk-cache configuration (see {@link
+   * ChunkCacheConfiguration}). The same {@link #shutdown()} requirement as {@link
+   * #initialize(JavaPlugin)} applies.
+   *
+   * @throws IllegalStateException If an attempt is made to initialize more than 1 time
+   */
+  public static void initialize(JavaPlugin javaPlugin, ChunkCacheConfiguration cacheConfiguration) {
 
     if (instance != null) throw new IllegalStateException("Can't be initialized twice");
 
     instance = javaPlugin;
+    ChunkCacheConfiguration.apply(cacheConfiguration);
+    if (cacheConfiguration.prefetchExecutor() != null) {
+      ChunkPrefetcher.useExecutor(cacheConfiguration.prefetchExecutor());
+    }
 
     chunkInvalidateListener = new ChunkInvalidateListener();
     Bukkit.getPluginManager().registerEvents(chunkInvalidateListener, javaPlugin);
@@ -44,6 +70,10 @@ public class PatheticBukkit {
                 + "Some functionalities might not be accessible, such as accessing the BlockState of blocks.");
       }
     }
+
+    FailingNavigationPointProvider.prewarm();
+    CacheSweeper.start(
+        FailingNavigationPointProvider::sweepCaches, cacheConfiguration.sweepIntervalMs());
 
     log.debug("Pathetic initialized");
   }
@@ -67,6 +97,11 @@ public class PatheticBukkit {
       HandlerList.unregisterAll(chunkInvalidateListener);
       chunkInvalidateListener = null;
     }
+
+    CacheSweeper.shutdown();
+    ChunkPrefetcher.shutdown();
+    AnvilChunkLoader.shutdown();
+    FailingNavigationPointProvider.clearAll();
 
     instance = null;
   }
