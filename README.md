@@ -8,6 +8,8 @@ and Paper. It provides a robust and flexible API for computing efficient paths w
 - High-performance A* pathfinding implementation with asynchronous computation
 - Configurable pathfinding parameters and customizable cost calculation
 - Native chunk loading support via NavigationPointProvider
+- Disk-accelerated chunk retrieval: generated-but-unloaded terrain is read straight from the world's Anvil region files off the main thread, so long-distance searches no longer stall loading chunks one border at a time
+- Corridor preloading at search start via `PreloadingHook`
 - Extensive validation and cost processing system
 - Built-in fallback strategies for complex pathfinding scenarios
 - Minimal performance impact with configurable iteration limits
@@ -104,11 +106,46 @@ public class MyPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Make sure to shutdown Pathetic
+        // REQUIRED: release Pathetic's shared resources
         PatheticBukkit.shutdown();
     }
 }
 ```
+
+> ⚠️ **You must call `PatheticBukkit.shutdown()` in `onDisable`.** Pathetic holds JVM-lifetime shared
+> state — background threads (chunk prefetch + cache sweeper) and a static chunk cache — that is *not*
+> tied to any individual `Pathfinder`. Skipping `shutdown()` leaks those threads and cached chunks
+> across every plugin reload.
+
+### Tuning the chunk cache (optional)
+
+Pathetic caches decoded chunks per world, retaining them by **heat**: each search that uses a chunk
+adds heat, idle time removes it, and a background sweep drops cooled chunks so the cache self-sizes
+to what you actually path through. Defaults are sensible; override any of them via
+`initialize(plugin, ChunkCacheConfiguration)`:
+
+```java
+import de.bsommerfeld.pathetic.bukkit.ChunkCacheConfiguration;
+import java.util.concurrent.TimeUnit;
+
+PatheticBukkit.initialize(this, ChunkCacheConfiguration.builder()
+        .heatDecayInterval(20, TimeUnit.SECONDS) // 1 heat lost per 20s idle (so 20s/40s/60s... of life)
+        .maxHeat(5)                              // max heat = max decay intervals a chunk survives idle
+        .sweepInterval(30, TimeUnit.SECONDS)     // how often cooled chunks are pruned
+        .maxCachedChunks(16384)                  // hard ceiling per world; omit for a heap-scaled default
+        .memoryPressureEviction(true)            // also shed cold chunks early when free heap is low
+        .minFreeHeapPercent(15)                  // ...below 15% free heap
+        .build());
+```
+
+The size limit is a heap-scaled out-of-memory backstop, not a working size — the cache normally sits
+far below it and shrinks itself when idle. With `memoryPressureEviction` enabled it additionally sheds
+cold chunks whenever free heap drops below the threshold, so the cache uses only the memory actually
+available and can't push the server toward OOM under sustained heavy pathfinding.
+
+To control the prefetch threads yourself, supply an executor with `.prefetchExecutor(myPool)` — use a
+pool **separate** from your search executor (prefetch does blocking disk IO, so sharing the search
+pool would starve searches). Pathetic never shuts a supplied executor down.
 
 ### 2. Create a Pathfinder
 
@@ -262,7 +299,7 @@ PathfinderConfiguration configuration = PathfinderConfiguration.builder()
 
 Pathetic provides two built-in providers:
 
-- `LoadingNavigationPointProvider`: Loads chunks automatically if needed (recommended)
+- `LoadingNavigationPointProvider`: Loads chunks automatically if needed (recommended). Chunks that are generated but not loaded are read directly from the world's region files on disk, off the main thread, instead of being loaded through the server.
 - `FailingNavigationPointProvider`: Fails if chunks are not loaded
 
 ```java
@@ -276,6 +313,7 @@ Pathetic provides two built-in providers:
 ## Performance Considerations
 
 - Always use asynchronous pathfinding to avoid blocking the main thread
+- Register the `PreloadingHook` (via `pathfindingHooks`) for long-distance searches so the chunk corridor is warmed in parallel ahead of the search front
 - Set appropriate `maxIterations` limits based on your use case
 - Use validation processors to eliminate invalid nodes early
 - Consider using fallback strategies for complex scenarios
