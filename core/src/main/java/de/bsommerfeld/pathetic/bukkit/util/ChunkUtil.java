@@ -10,11 +10,14 @@ import org.bukkit.Material;
 @UtilityClass
 public class ChunkUtil {
 
+  private static final boolean PRE_FLATTENING =
+      BukkitVersionUtil.isLegacyVersion() && BukkitVersionUtil.getVersion().isUnder(13, 0);
+
   private static Method materialMethod;
   private static Method blockTypeMethod;
 
   static {
-    if (BukkitVersionUtil.isLegacyVersion() && BukkitVersionUtil.getVersion().isUnder(13, 0)) {
+    if (PRE_FLATTENING) {
       try {
         materialMethod = Material.class.getDeclaredMethod("getMaterial", int.class);
         blockTypeMethod =
@@ -33,7 +36,7 @@ public class ChunkUtil {
   /** Get the block type from a chunk snapshot at the given coordinates */
   @SneakyThrows
   public Material getMaterial(ChunkSnapshot snapshot, int x, int y, int z) {
-    if (BukkitVersionUtil.isLegacyVersion() && BukkitVersionUtil.getVersion().isUnder(13, 0)) {
+    if (PRE_FLATTENING) {
       if (materialMethod == null || blockTypeMethod == null)
         throw new IllegalStateException("Reflection Failure");
       try {
