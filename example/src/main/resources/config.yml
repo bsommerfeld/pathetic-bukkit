@@ -1,0 +1,60 @@
+# Pathetic example pathfinder configuration.
+#
+# Every value below can also be changed in-game - no jar rebuild needed:
+#   /path config                 -> list all options and their current values
+#   /path config <key> <value>   -> change a value (saved here + applied live)
+#   /path config reload          -> re-read this file from disk and apply it
+#
+# Whenever a value changes the pathfinder is rebuilt immediately, so the next
+# /path start (or /path swarm) uses the new configuration.
+
+# Maximum A* iterations before the search gives up (> 0).
+max-iterations: 1000000
+
+# Maximum path length in positions, 0 = unlimited (>= 0).
+max-length: 0
+
+# Run searches asynchronously off the main thread.
+async: true
+
+# Return the best partial path when no complete path is found.
+fallback: true
+
+# Re-evaluate already-closed nodes when a cheaper route is found (slower, more accurate).
+reopen-closed-nodes: false
+
+# Heuristic: SQUARED (faster, less accurate) or LINEAR (accurate as fuck).
+heuristic: SQUARED
+
+# Neighbours to explore: VERTICAL_AND_HORIZONTAL (6) or DIAGONAL_3D (26).
+neighbor-strategy: VERTICAL_AND_HORIZONTAL
+
+# Spigot needs this hook to run searches asynchronously.
+hook-spigot: true
+
+# Opt-in bStats metrics (https://bstats.org/plugin/bukkit/pathetic-bukkit/29080).
+hook-metrics: true
+
+# Warm the chunk corridor between start and target before each search.
+hook-preloading: true
+
+# Register the example SimpleValidationProcessor.
+validation: true
+
+# Chunk cache tuning. Unlike the options above, these are applied once at startup, so changing them
+# needs a server restart (not "/path config reload"). The cache keeps a chunk by "heat": every search
+# that uses it adds 1 heat, and it loses 1 heat per heat-decay-seconds idle, dropping at 0. So a
+# chunk survives (its heat) x (heat-decay-seconds) idle — e.g. at 20s, that's 20s/40s/60s/... .
+cache:
+  # Idle seconds that remove one heat. Lower = chunks cool (and free memory) faster.
+  heat-decay-seconds: 60
+  # Maximum heat a chunk can build up (how many decay intervals it can survive idle).
+  max-heat: 5
+  # How often (seconds) the background sweep prunes cooled-to-zero chunks.
+  sweep-seconds: 60
+  # Hard ceiling on cached chunks per world (an OOM backstop). 0 = auto, scaled to the server heap.
+  max-chunks: 0
+  # Also shed cold chunks early when free heap runs low ("use only the memory that's free").
+  memory-pressure-eviction: false
+  # Free-heap percentage below which the above kicks in.
+  min-free-heap-percent: 15

@@ -6,9 +6,14 @@ import de.bsommerfeld.pathetic.api.pathing.result.PathfinderResult;
 import de.bsommerfeld.pathetic.api.wrapper.PathPosition;
 import de.bsommerfeld.pathetic.bukkit.context.BukkitEnvironmentContext;
 import de.bsommerfeld.pathetic.bukkit.mapper.BukkitMapper;
+import de.bsommerfeld.pathetic.example.config.PathfinderManager;
+import de.bsommerfeld.pathetic.example.config.PathfinderSettings;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -36,13 +41,13 @@ public class PatheticCommand implements TabExecutor {
   // Plugin instance, needed to schedule the swarm ticker
   private final JavaPlugin plugin;
 
-  // Pathfinder instance to handle pathfinding logic
-  private final Pathfinder pathfinder;
+  // Owns the live, reconfigurable pathfinder and its settings
+  private final PathfinderManager pathfinderManager;
 
-  // Constructor to initialize the pathfinder
-  public PatheticCommand(JavaPlugin plugin, Pathfinder pathfinder) {
+  // Constructor to initialize the pathfinder manager
+  public PatheticCommand(JavaPlugin plugin, PathfinderManager pathfinderManager) {
     this.plugin = plugin;
-    this.pathfinder = pathfinder;
+    this.pathfinderManager = pathfinderManager;
   }
 
   // Handle command execution
@@ -52,11 +57,27 @@ public class PatheticCommand implements TabExecutor {
     // Ensure the sender is a player
     if (!(sender instanceof Player)) return false;
 
-    // Ensure the command has exactly one argument
-    if (args.length != 1) return false;
+    // Ensure at least the sub-command is given
+    if (args.length == 0) {
+      sender.sendMessage("Usage: /path <pos1|pos2|start|swarm|config>");
+      return false;
+    }
 
     // Cast sender to Player
     Player player = (Player) sender;
+
+    // "/path config ..." manages the runtime configuration and takes a variable number of
+    // arguments, so it is handled before the single-argument sub-commands below.
+    if (args[0].equalsIgnoreCase("config")) {
+      handleConfig(player, args);
+      return true;
+    }
+
+    // The remaining sub-commands take exactly one argument
+    if (args.length != 1) return false;
+
+    // Always read the manager's current pathfinder, so live config changes apply.
+    Pathfinder pathfinder = pathfinderManager.pathfinder();
 
     // Retrieve or create a new player session
     PlayerSession playerSession =
@@ -94,7 +115,7 @@ public class PatheticCommand implements TabExecutor {
 
         /*
          * Initiate pathfinding with the start and target positions. This is where the magic happens
-         * and where all the configuration stuff we initialized before does their job.
+         * and where all the configuration stuff from config.yml does its job.
          *
          * Since 5.1.0: Here we have to give the findPath method a new BukkitEnvironmentContext,
          * which effectively gives the Pathfinder information about the world (or THE world).
@@ -143,7 +164,7 @@ public class PatheticCommand implements TabExecutor {
           break;
         }
 
-        SwarmSession swarmSession = new SwarmSession(plugin, pathfinder, player);
+        SwarmSession swarmSession = new SwarmSession(plugin, pathfinderManager, player);
         SWARM_MAP.put(player.getUniqueId(), swarmSession);
         swarmSession.start();
 
@@ -161,11 +182,98 @@ public class PatheticCommand implements TabExecutor {
     return false;
   }
 
+  /**
+   * Handles {@code /path config}: lists options, reloads config.yml, or sets a single value. Every
+   * change is saved to disk and the pathfinder is rebuilt immediately, so no jar rebuild is needed.
+   */
+  private void handleConfig(Player player, String[] args) {
+    PathfinderSettings settings = pathfinderManager.settings();
+
+    // "/path config" -> list every option with its current value
+    if (args.length == 1) {
+      player.sendMessage("Pathfinder configuration (change with /path config <key> <value>):");
+      for (PathfinderSettings.Option option : settings.options()) {
+        player.sendMessage(
+            " - "
+                + option.key()
+                + " = "
+                + option.displayValue()
+                + "  ("
+                + option.description()
+                + ")");
+      }
+      return;
+    }
+
+    // "/path config reload" -> re-read config.yml from disk and apply it
+    if (args.length == 2 && args[1].equalsIgnoreCase("reload")) {
+      plugin.reloadConfig();
+      settings.load(plugin.getConfig());
+      pathfinderManager.rebuild();
+      player.sendMessage("Reloaded config.yml and rebuilt the pathfinder.");
+      return;
+    }
+
+    // "/path config <key> <value>" -> set, save, and rebuild
+    if (args.length < 3) {
+      player.sendMessage("Usage: /path config <key> <value>  |  /path config reload");
+      return;
+    }
+
+    try {
+      PathfinderSettings.Option option = settings.set(args[1], args[2]);
+      settings.save();
+      pathfinderManager.rebuild();
+      player.sendMessage(
+          "Set " + option.key() + " = " + option.displayValue() + " and rebuilt the pathfinder.");
+    } catch (IllegalArgumentException e) {
+      player.sendMessage("Could not set value: " + e.getMessage());
+    }
+  }
+
   // Provide tab completion for the command
   @Override
   public List<String> onTabComplete(
       CommandSender sender, Command command, String label, String[] args) {
-    return Arrays.asList("pos1", "pos2", "start", "swarm");
+
+    if (args.length == 1) {
+      return filter(Arrays.asList("pos1", "pos2", "start", "swarm", "config"), args[0]);
+    }
+
+    if (args[0].equalsIgnoreCase("config")) {
+      // Second argument: "reload" or any option key
+      if (args.length == 2) {
+        List<String> keys = new ArrayList<>();
+        keys.add("reload");
+        for (PathfinderSettings.Option option : pathfinderManager.settings().options()) {
+          keys.add(option.key());
+        }
+        return filter(keys, args[1]);
+      }
+
+      // Third argument: the value suggestions for the chosen key
+      if (args.length == 3) {
+        for (PathfinderSettings.Option option : pathfinderManager.settings().options()) {
+          if (option.key().equalsIgnoreCase(args[1])) {
+            return filter(option.suggestions(), args[2]);
+          }
+        }
+      }
+    }
+
+    return Collections.emptyList();
+  }
+
+  // Keep only suggestions that start with what the player has typed so far
+  private static List<String> filter(List<String> suggestions, String input) {
+    String prefix = input.toLowerCase(Locale.ROOT);
+    List<String> matches = new ArrayList<>();
+    for (String suggestion : suggestions) {
+      if (suggestion.toLowerCase(Locale.ROOT).startsWith(prefix)) {
+        matches.add(suggestion);
+      }
+    }
+    return matches;
   }
 
   /**
@@ -183,7 +291,7 @@ public class PatheticCommand implements TabExecutor {
     private static final double MAX_TARGET_DISTANCE = 18;
 
     private final JavaPlugin plugin;
-    private final Pathfinder pathfinder;
+    private final PathfinderManager pathfinderManager;
     private final Player player;
     private final Random random = new Random();
 
@@ -197,9 +305,9 @@ public class PatheticCommand implements TabExecutor {
     private int ticks;
     private BukkitTask task;
 
-    private SwarmSession(JavaPlugin plugin, Pathfinder pathfinder, Player player) {
+    private SwarmSession(JavaPlugin plugin, PathfinderManager pathfinderManager, Player player) {
       this.plugin = plugin;
-      this.pathfinder = pathfinder;
+      this.pathfinderManager = pathfinderManager;
       this.player = player;
     }
 
@@ -215,6 +323,8 @@ public class PatheticCommand implements TabExecutor {
         return;
       }
 
+      // Pick up the current pathfinder each tick, so a "/path config" change applies mid-swarm.
+      Pathfinder pathfinder = pathfinderManager.pathfinder();
       PathPosition center = BukkitMapper.toPathPosition(player.getLocation());
       BukkitEnvironmentContext context = new BukkitEnvironmentContext(player.getWorld());
 

@@ -1,18 +1,13 @@
 package de.bsommerfeld.pathetic.example;
 
-import de.bsommerfeld.pathetic.api.factory.PathfinderFactory;
-import de.bsommerfeld.pathetic.api.pathing.Pathfinder;
-import de.bsommerfeld.pathetic.api.pathing.configuration.PathfinderConfiguration;
-import de.bsommerfeld.pathetic.api.pathing.heuristic.HeuristicStrategies;
+import de.bsommerfeld.pathetic.bukkit.ChunkCacheConfiguration;
 import de.bsommerfeld.pathetic.bukkit.PatheticBukkit;
-import de.bsommerfeld.pathetic.bukkit.hook.MetricsHook;
-import de.bsommerfeld.pathetic.bukkit.hook.SpigotPathfindingHook;
-import de.bsommerfeld.pathetic.bukkit.provider.LoadingNavigationPointProvider;
-import de.bsommerfeld.pathetic.engine.factory.AStarPathfinderFactory;
 import de.bsommerfeld.pathetic.example.command.PatheticCommand;
+import de.bsommerfeld.pathetic.example.config.PathfinderManager;
+import de.bsommerfeld.pathetic.example.config.PathfinderSettings;
 import de.bsommerfeld.pathetic.example.listener.ChunkInvalidateListener;
-import de.bsommerfeld.pathetic.example.processor.SimpleValidationProcessor;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PatheticPlugin extends JavaPlugin {
@@ -21,49 +16,52 @@ public final class PatheticPlugin extends JavaPlugin {
   @Override
   public void onEnable() {
 
-    // Initialize Pathetic with this plugin instance
-    PatheticBukkit.initialize(this);
+    /*
+     * The whole pathfinder configuration now lives in config.yml instead of being hard-coded.
+     *
+     * saveDefaultConfig() copies the bundled config.yml on first run; PathfinderSettings then
+     * loads every option from it. The PathfinderManager builds the actual Pathfinder from those
+     * settings and can rebuild it on the fly - that is what lets "/path config <key> <value>"
+     * change the configuration in-game without ever rebuilding the jar.
+     */
+    saveDefaultConfig();
 
-    // Create the respective PathfinderFactory
-    PathfinderFactory factory = new AStarPathfinderFactory();
+    // The chunk-cache tuning is applied once at startup, so it is read before initialize().
+    PatheticBukkit.initialize(this, readCacheConfiguration(getConfig()));
 
-    // Create custom configuration for the pathfinder
-    // Keep in mind that a provider must always be given
-    PathfinderConfiguration configuration =
-        PathfinderConfiguration.builder()
-            .provider(new LoadingNavigationPointProvider()) // For loading chunks
-            .fallback(true) // Allow fallback strategies if the primary fails
-            .validationProcessors(List.of(new SimpleValidationProcessor()))
-            .async(true)
+    PathfinderSettings settings = new PathfinderSettings(this);
+    settings.load(getConfig());
 
-            // SQUARED is more performant, but less accurate. For "accurate as fuck" use LINEAR
-            .heuristicStrategy(HeuristicStrategies.SQUARED)
+    PathfinderManager pathfinderManager = new PathfinderManager(settings);
 
-            /*
-             * You can register PathfindingHooks via the configuration.
-             * For example, Spigot NEEDS SpigotPathfindingHook to work asynchronously!
-             *
-             * The MetricsHook is an opt-in hook in order to help with development
-             * by providing generic data to https://bstats.org/plugin/bukkit/pathetic-bukkit/29080
-             */
-            .pathfindingHooks(List.of(new SpigotPathfindingHook(), new MetricsHook()))
-
-            // a higher count allows for more freedom, but also increases
-            // computation / wait-time for failure
-            .maxIterations(1_000_000)
-            .build();
-
-    // There are many more options inside the configuration which are not covered here.
-    // Not all options are useful for everyone, and I would advise, to keep your fingers away
-    // From options you can't assign. There are always good default values set!
-
-    // Create the pathfinding instance with the factory from the configuration.
-    Pathfinder reusablePathfinder = factory.createPathfinder(configuration);
-
-    // Register the command executors
-    getCommand("pathetic").setExecutor(new PatheticCommand(this, reusablePathfinder));
+    // Register the command executors. The command reads the manager's current pathfinder, so it
+    // always uses the latest configuration.
+    getCommand("pathetic").setExecutor(new PatheticCommand(this, pathfinderManager));
 
     // Register the ChunkInvalidateListener
     getServer().getPluginManager().registerEvents(new ChunkInvalidateListener(), this);
+  }
+
+  // IMPORTANT: release Pathetic's shared threads and caches, or they leak across a reload.
+  @Override
+  public void onDisable() {
+    PatheticBukkit.shutdown();
+  }
+
+  private static ChunkCacheConfiguration readCacheConfiguration(FileConfiguration config) {
+    ChunkCacheConfiguration.Builder builder =
+        ChunkCacheConfiguration.builder()
+            .heatDecayInterval(config.getLong("cache.heat-decay-seconds", 60), TimeUnit.SECONDS)
+            .maxHeat(config.getInt("cache.max-heat", 5))
+            .sweepInterval(config.getLong("cache.sweep-seconds", 60), TimeUnit.SECONDS);
+
+    int maxChunks = config.getInt("cache.max-chunks", 0); // 0 = auto (heap-scaled)
+    if (maxChunks > 0) builder.maxCachedChunks(maxChunks);
+
+    builder
+        .memoryPressureEviction(config.getBoolean("cache.memory-pressure-eviction", false))
+        .minFreeHeapPercent(config.getInt("cache.min-free-heap-percent", 15));
+
+    return builder.build();
   }
 }
