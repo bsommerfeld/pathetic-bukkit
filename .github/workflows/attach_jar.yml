@@ -1,4 +1,4 @@
-name: Build and Attach pathetic-example jar to release
+name: Build, Attach jar, and Update Release Changelog
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-release:
-    name: Build and Attach
+    name: Build, Test, and Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -29,16 +31,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Build
-        run: mvn clean install -B -DskipTests
+      - name: Build and Test
+        id: build_test
+        run: mvn clean install -B -U
 
-      - name: Upload Example artifact
-        uses: actions/upload-artifact@v4
+      - name: Prepare Build Status Badges
+        if: always()
+        id: badges
+        run: |
+          if [ "${{ steps.build_test.outcome }}" = "success" ]; then
+            BUILD_BADGE="![Build Success](https://img.shields.io/badge/Build-Success-brightgreen)"
+            TEST_BADGE="![Tests Succeeded](https://img.shields.io/badge/Tests-Succeeded-brightgreen)"
+          else
+            BUILD_BADGE="![Build Failed](https://img.shields.io/badge/Build-Failed-red)"
+            TEST_BADGE="![Tests Failed](https://img.shields.io/badge/Tests-Failed-red)"
+          fi
+          echo "build-badge=${BUILD_BADGE}" >> $GITHUB_OUTPUT
+          echo "test-badge=${TEST_BADGE}" >> $GITHUB_OUTPUT
+
+      - name: Update Release with Changelog
+        if: always()
+        uses: bsommerfeld/release-changelog@v0.1
         with:
-          name: example
-          path: example/target/pathetic-example.jar
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          prepend-text: |
+            ${{ steps.badges.outputs.build-badge }} ${{ steps.badges.outputs.test-badge }}
 
       - name: Attach jar to release
+        if: steps.build_test.outcome == 'success'
         uses: softprops/action-gh-release@v2
         with:
           files: example/target/pathetic-example.jar
