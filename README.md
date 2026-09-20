@@ -1,4 +1,4 @@
-# Pathetic Bukkit ![Downloads](https://jitpack.io/v/bsommerfeld/pathetic-bukkit/month.svg)
+# Pathetic Bukkit ![Downloads](https://jitpack.io/v/bsommerfeld/pathetic-bukkit/month.svg) [![Servers](https://img.shields.io/bstats/servers/29080?label=Servers)](https://bstats.org/plugin/bukkit/pathetic-bukkit/29080)
 
 Pathetic is a high-performance A* pathfinding library for Minecraft servers, specifically designed for Bukkit, Spigot,
 and Paper. It provides a robust and flexible API for computing efficient paths within the Minecraft world.
